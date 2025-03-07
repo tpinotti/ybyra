@@ -94,7 +94,7 @@ rule Ytree:
      params:
        sm="{sample}",
      shell:
-       "python src/ytree.py --lib both --alleles {input} --out ytree/{params.sm} --snpinfo {HG_INFO}"
+       "python src/ytree.py --lib both --alleles {input} --out calls/{params.sm} --snpinfo {HG_INFO}"
 
 rule Yplace:
     input:
