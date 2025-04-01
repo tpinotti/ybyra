@@ -24,7 +24,7 @@ def main(calls_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python count_states.py <calls_file>")
+        print("Usage: python ycounter.py <calls_file>")
         sys.exit(1)
     
     calls_file = sys.argv[1]
