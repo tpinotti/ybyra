@@ -1,8 +1,3 @@
-###
-###	ybyra 3.0
-###
-###
-
 import pandas as pd
 import argparse
 
