@@ -1,5 +1,5 @@
-prefix: tp
-ref: /projects/lundbeck/data/hg38/genome.fa
+prefix: #projectcode
+ref: #path/to/hg38/genome.fa
 hg_snps: tree/jun24.snpinfo.yFull.bed
 hg_info: tree/jun24.snpinfo.yFull.tsv
 tree: tree/jun24_yFull.v12.tree
