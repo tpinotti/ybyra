@@ -174,3 +174,18 @@ Additional outputs per sample are generated across different folders:
 - `.yplace`: Tree scores for all nodes in the phylogeny with a derived or ancestral call
 
 ---
+
+## Acknowledgement
+
+Thanks to Lucas Czech and Martin Sikora for bits and pieces of both code and ideas. All implementation problems, both of code and ideas, are mine. We also thank the yFull team for making their data freely available for the community.
+
+## Citation
+
+If you find this useful, you can cite yplace as:
+
+
+https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2
+
+
+
+
