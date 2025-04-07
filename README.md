@@ -1,23 +1,23 @@
-# yplace: Y-chromosome phylogeny placement tool
+# ybyra: Y-chromosome phylogeny placement tool
 
-yplace is a Snakemake workflow which calls Y-chromosome haplogroups by using a tree-based scoring of derived and ancestral SNP calls.
+ybyra is a Snakemake workflow which calls Y-chromosome haplogroups by using a tree-based scoring of derived and ancestral SNP calls.
 
 
 
 ## Requirements
 
-To use yplace you need:
+To use ybyra you need:
 
 - `python 3` (with `pandas`)
 - `snakemake`
 - `bcftools`
 - A BAM file aligned to GRCh38
 
-The Y-SNP tree used by yplace was built using yFull public data from June 2024 (v12.00.0), ensuring strict treeness for all informative SNPs.
+The Y-SNP tree used by ybyra was built using yFull public data from June 2024 (v12.00.0), ensuring strict treeness for all informative SNPs.
 
 ## Getting Started
 
-To run yplace, copy the `src/` and `tree/` folders into your working directory, and prepare `config.yml` and `units.tsv` files.
+To run ybyra, copy the `src/` and `tree/` folders into your working directory, and prepare `config.yml` and `units.tsv` files.
 
 ### `config.yml`
 
@@ -40,7 +40,7 @@ sampleId    bam
 - `sampleId`: the individual name  
 - `bam`: path to the BAM file
 
-### Running yplace
+### Running ybyra
 
 Once everything is set up, you can run the workflow, for example using 12 threads, like this:
 
@@ -68,12 +68,12 @@ Library type can be specified (`ss`, `ds`, or `both`, with `both` as default). T
 
 ## Haplogroup Placement
 
-For each node in the tree where a sample has derived SNPs, yplace calculates a tree score:
+For each node in the tree where a sample has a derived or ancestral SNPs, ybyra calculates a tree score:
 
 - +1 for every derived SNP from the root to the node
 - –1 for every ancestral SNP along the same path
 
-Instead of returning the node with the highest score, yplace selects the *optimal placement* — the highest-scoring node with no ancestral SNPs (i.e., 100% concordance).
+Instead of returning the node with the highest score, ybyra selects the *optimal placement* — the highest-scoring node with no ancestral SNPs (i.e., 100% concordance).
 
 If a downstream node has a higher score but includes ancestral calls, the sample is flagged as `unstable_downstream`.
 
@@ -82,7 +82,7 @@ If a downstream node has a higher score but includes ancestral calls, the sample
 When multiple nodes have the same top tree score (often in low-coverage or low-resolution areas):
 
 - The sample is flagged with `score_tie`
-- yplace selects the node with the shortest path to the root
+- ybyra selects the node with the shortest path to the root
 - If one of the tied nodes is ancestral to the others, it is also reported
 
 ---
@@ -99,7 +99,7 @@ This is the summary output table. Columns:
 | `optplacement` | Selected placement node |
 | `tree_score` | Total score |
 | `flag` | Any flags set for this sample |
-| `tree_path` | Tip-to-root path (root = `ybyra`) |
+| `tree_path` | Tip-to-root path (root = `ybyra`, Classic Tupi word for 'tree') |
 
 #### Flags
 
@@ -179,12 +179,16 @@ Additional outputs per sample are generated across different folders:
 
 Thanks to Lucas Czech and Martin Sikora for bits and pieces of both code and ideas. All implementation problems, both of code and ideas, are mine. We also thank the yFull team for making their data freely available for the community.
 
+This is a stable draft version of ybyra; ideas and suggestions are very welcome. We can incorporate those, along other planned functionalities, in the software standalone release. You can get in touch at thomaz.pinotti(at)sund.ku.dk
+
+
 ## Citation
 
-If you find this useful, you can cite yplace as:
+If you find this useful, for now you can cite ybyra as:
 
 
 https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2
+
 
 
 
