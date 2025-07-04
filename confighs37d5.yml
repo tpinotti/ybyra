@@ -1,0 +1,21 @@
+# Basic parameters
+prefix: suomi2
+MQ: 20
+
+# Reference build - specify "hg38", "hg19", or "hs37d5"
+ref_build: "hs37d5"  # Change this based on your data
+
+# Reference genome path (should match your ref_build)
+ref: "/home/teemu/aDNApipeline/hs37d5.fa"
+
+# If ref_build is not hg38, you need these additional parameters:
+hg38_ref: "/home/teemu/aDNApipeline/hg38.p13.fa"
+chain_file: "/home/teemu/ybyra/GRCh37_to_GRCh38.chain.gz"  # Works for both hg19 and hs37d5 with bcftools +liftover
+
+# Haplogroup analysis files
+hg_snps: tree/jun24.snpinfo.yFull.bed
+hg_info: tree/jun24.snpinfo.yFull.tsv
+tree: tree/jun24_yFull.v12.tree
+
+# Sample information
+units: "suomi.tsv"
