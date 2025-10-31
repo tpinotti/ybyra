@@ -263,7 +263,7 @@ Thanks to Lucas Czech and Martin Sikora for code and ideas, and to Hugh McColl, 
 
  We also thank ISOGG (https://isogg.org),  yFull (https://www.yfull.com) and FamilyTree DNA (https://discover.familytreedna.com) for making their tree publicly available for the community.
 
-This is a stable draft version of ybyra; ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk
+Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk
 
 ## Version
 
