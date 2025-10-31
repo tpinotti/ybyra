@@ -1,0 +1,10 @@
+prefix: ybyra
+ref: /path/to/reference/genome
+chrom: chrY
+hg_snps: trees/isogg/hg38/isogg.v15.73.2020.hg38.bed
+hg_info: trees/isogg/hg38/isogg.v15.73.2020.hg38.tsv
+tree: trees/isogg/isogg.v15.73.2020.complete.tree
+MQ: 30
+units:  units.tsv
+damage_filter: false
+lib_type: both

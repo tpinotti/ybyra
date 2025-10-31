@@ -1,0 +1,10 @@
+prefix: ybyra
+ref: /path/to/reference/genome
+chrom: Y
+hg_snps: trees/yfull/hg37/yFull.13.hg37.bed
+hg_info: trees/yfull/hg37/yFull.13.hg37.tsv
+tree: trees/yfull/yFull.13.complete.tree
+MQ: 30
+units:  units.tsv
+damage_filter: false
+lib_type: both
