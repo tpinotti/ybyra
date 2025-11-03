@@ -2,6 +2,7 @@
 
 ybyra is a Snakemake workflow which calls Y-chromosome haplogroups from bam files by using a tree-based scoring of derived and ancestral SNP calls.
 
+
 ## Quick overview
 
 With ybyra you can:
@@ -10,6 +11,7 @@ With ybyra you can:
 - Use either ISOGG, yFull or FamilyTreeDNA (FTDNA) Y-SNP trees
 - Apply an optional ancient DNA (aDNA) damage filter
 - Plot phylogenetic placements for all samples
+
 
 ## Requirements
 
@@ -20,16 +22,19 @@ To use ybyra you need:
 - `bcftools`
 - `ete3 <= 3.1.3` (only for plotting)
 
-A conda env file with these dependencies is provided in `workflow/envs/ybyra.yaml`. Use for instance `micromamba create -f workflow/envs/ybyra.yaml -n ybyra` (or your preferred conda-like tool) to create an environment, and `micromamba activate ybyra` to activate it prior to running the steps explained below.
+A conda env file with these dependencies is provided in `workflow/envs/ybyra.yaml`. Use for instance `micromamba create -f workflow/envs/ybyra.yaml -n ybyra` (or your preferred conda-like tool) to create an environment, and `micromamba activate ybyra` to activate it prior to running the steps below.
+
 
 ## Getting Started
 
 ### 1. Get ybyra
-To run ybyra, clone this repository or copy the `src/`, `trees/` and `configs/` folders into your working directory, as well as `ybyra.v03.smk`.
+
+To run ybyra, clone this repository or download a stable [release version](https://github.com/tpinotti/ybyra/releases) or the latest update from the green "Code" button above via ["Download ZIP"](https://github.com/tpinotti/ybyra/archive/refs/heads/main.zip).
+
 
 ### 2. Create your  `units.tsv`
-Prepare a tab-separated `units.tsv` file, listing your samples and bam paths:
 
+Prepare a tab-separated `units.tsv` file, listing your samples and bam paths:
 
 ### `units.tsv`
 
@@ -43,8 +48,8 @@ Kennewick	/projects/bam/rasmussen2015/Kennewick.bam
 
 
 ### 3. Choose and edit your configuration file
-Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome BAM files are mapped to. This is done through the yaml files in the `configs/` folder.
 
+Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome BAM files are mapped to. This is done through the yaml files in the `configs/` folder.
 
 The `configs/` folder looks like this:
 
@@ -57,12 +62,9 @@ The `configs/` folder looks like this:
 
 ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
-
 In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `configs/hg37.ftdna.yml`.
 
-
 We then need to update the corresponding line in the config with the path to the human reference genome hg37 in your system. If your reference genome for some reason does not use Y (or chrY for hg38) to denote the Y-chromosome, a quick workaround is to modify the 'chrom' line accordingly.
-
 
 ### `configs/hg37.ftdna.yml`
 
@@ -79,12 +81,11 @@ damage_filter: false
 lib_type: both
 ```
 
+
 ### 4. (Optional) Enable Ancient DNA damage filter
 Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your chosen config file. If you set `damage_filter` to `true`, ybyra will call haplogroups excluding all SNPs flagged as potentially deriving from ancient DNA damage.
 
-
 As the damage profile is dependent on library type, users must report whether libraries were `ds` (double-stranded), `ss` (single-stranded) or `both` (both library types in the bam file or unknown; default).
-
 
 If `damage_filter` is set to `false`, ybyra will still flag SNPs as damaged, but will not perform any filtering.
 
@@ -122,6 +123,7 @@ Instead of just returning the node with the highest score, ybyra selects the *op
 
 In the case of the optimal placement including ancestral calls, the sample is flagged as `unstable_downstream`.
 
+
 ### Score Ties
 
 When multiple nodes have the same top tree score  (often in low-coverage or low-resolution areas) and all pass the 5 step rule:
@@ -139,6 +141,7 @@ ybyra generates two plots:
 
 Example plots from ancient individuals from Antonio et al. 2019 (10.1126/science.aay6826) are in the `examples/` folder.
 
+
 ## Main Output Files
 
 ### `aggregate.yplace`
@@ -152,6 +155,7 @@ This is the summary output table. Columns:
 | `tree_score` | Total score |
 | `flag` | Any flags set for this sample |
 | `tree_path` | Tip-to-root path (root = `ybyra`, 'tree' in Tupi) |
+
 
 #### Flags
 
@@ -264,10 +268,6 @@ Thanks to Lucas Czech and Martin Sikora for code and ideas, and to Hugh McColl, 
  We also thank ISOGG (https://isogg.org),  yFull (https://www.yfull.com) and FamilyTree DNA (https://discover.familytreedna.com) for making their tree publicly available for the community.
 
 Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk
-
-## Version
-
-This is ybyra v0.3 (30/10/25).
 
 ## Citation
 
