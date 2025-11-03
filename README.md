@@ -32,9 +32,14 @@ A conda env file with these dependencies is provided in `workflow/envs/ybyra.yam
 To run ybyra, clone this repository or download a stable [release version](https://github.com/tpinotti/ybyra/releases) or the latest update from the green "Code" button above via ["Download ZIP"](https://github.com/tpinotti/ybyra/archive/refs/heads/main.zip).
 
 
-### 2. Create your  `units.tsv`
+### 2. Create a working directory
 
-Prepare a tab-separated `units.tsv` file, listing your samples and bam paths:
+First, we create a *working directory* where we want our analysis to run, i.e., where output files will be generated. It can be called anything, such as `my_analysis`.
+
+
+### 3. Create your `units.tsv`
+
+Prepare a tab-separated `units.tsv` file in the working directory, listing your samples and bam paths:
 
 ### `units.tsv`
 
@@ -47,42 +52,17 @@ Kennewick	/projects/bam/rasmussen2015/Kennewick.bam
 - `bam`: path to the BAM file
 
 
-### 3. Choose and edit your configuration file
+### 4. Create your configuration file
 
-Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome BAM files are mapped to. This is done through the yaml files in the `configs/` folder.
+Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
-The `configs/` folder looks like this:
+In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
-- `configs/hg37/hg37.isogg.yml`:  ISOGG Y-SNP tree in hg37
-- `configs/hg38/hg38.isogg.yml`:  ISOGG Y-SNP tree in hg38
-- `configs/hg37/hg37.yfull.yml`:  yFull Y-SNP tree in hg37
-- `configs/hg38/hg38.yfull.yml`:  yFull Y-SNP tree in hg38
-- `configs/hg37/hg37.ftdna.yml`: FamilyTree DNA Y-SNP tree in hg37
-- `configs/hg38/hg38.ftdna.yml`: FamilyTree DNA Y-SNP tree in hg38
-
-ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
-
-In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `configs/hg37.ftdna.yml`.
-
-We then need to update the corresponding line in the config with the path to the human reference genome hg37 in your system. If your reference genome for some reason does not use Y (or chrY for hg38) to denote the Y-chromosome, a quick workaround is to modify the 'chrom' line accordingly.
-
-### `configs/hg37.ftdna.yml`
-
-```
-prefix: ybyra
-ref: path/to/reference/genome	## change here
-chrom: Y
-hg_snps: trees/ftdna/hg37/ftdnaY.oct25.hg37.bed
-hg_info: trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv
-tree: trees/ftdna/ftdnaY.oct25.complete.tree
-MQ: 30
-units:  units.tsv
-damage_filter: false
-lib_type: both
-```
+In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
 
 
-### 4. (Optional) Enable Ancient DNA damage filter
+### 5. (Optional) Enable Ancient DNA damage filter
+
 Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your chosen config file. If you set `damage_filter` to `true`, ybyra will call haplogroups excluding all SNPs flagged as potentially deriving from ancient DNA damage.
 
 As the damage profile is dependent on library type, users must report whether libraries were `ds` (double-stranded), `ss` (single-stranded) or `both` (both library types in the bam file or unknown; default).
@@ -90,12 +70,13 @@ As the damage profile is dependent on library type, users must report whether li
 If `damage_filter` is set to `false`, ybyra will still flag SNPs as damaged, but will not perform any filtering.
 
 
-### 5. Run ybyra
+### 6. Run ybyra
 
+At this stage, the working directory should contain two files, `config.yaml` and `units.tsv`.
 Once everything is set up, you can run the workflow, for example, using 12 threads, like this:
 
 ```
-snakemake -s ybyra.v03.smk --configfile configs/hg37/hg37.ftdna.yml --cores 12
+snakemake -s ybyra.v03.smk --configfile config/hg37/hg37.ftdna.yml --cores 12
 ```
 
 

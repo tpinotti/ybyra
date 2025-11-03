@@ -1,0 +1,79 @@
+# ============================================================
+#     User settings
+# ============================================================
+
+# Reference genome fasta file that the bam files are mapped against.
+# Needs to be indexed already, e.g., with `samtools faidx genome.fa`.
+# Note that this needs to be either hg37 or hg38, and the "build"
+# setting below needs to be changed accordingly as well.
+# We require this to be present, to avoid re-downloading it.
+# The bam files are mapped against this, so it should be available anyway.
+ref: "/path/to/reference/genome"
+
+# Name of units table listing the bam files.
+units: "units.tsv"
+
+# Human reference genome build, choose one of "hg37" or "hg38",
+# depending on the reference genome you selected above.
+build: "hg38"
+
+# SNP tree to use as reference,
+# choose one of "isogg", "yfull", or "ftdna"
+# for the ISOGG, yFull, or FamilyTree DNA tree.
+tree: "isogg"
+
+# Run the Y-placement with an additional damage filter,
+# choose "true" or "false".
+damage_filter: false
+
+# Library build:
+#  - "ds" for double-stranded,
+#  - "ss" for single-stranded,
+#  - "both" if both were merged in bam
+lib_type: "both"
+
+# Prefix for output files. It's actually a suffix though. Don't ask.
+prefix: "ybyra"
+
+# Mapping quality filter applied to the bam files.
+MQ: 30
+
+# ============================================================
+#     Internal settings (no need to change)
+# ============================================================
+
+hg37_ftdna:
+  chrom: "Y"
+  hg_snps: "trees/ftdna/hg37/ftdnaY.oct25.hg37.bed"
+  hg_info: "trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv"
+  tree: "trees/ftdna/ftdnaY.oct25.complete.tree"
+
+hg37_isogg:
+  chrom: "Y"
+  hg_snps: "trees/isogg/hg37/isogg.v15.73.2020.hg37.bed"
+  hg_info: "trees/isogg/hg37/isogg.v15.73.2020.hg37.tsv"
+  tree: "trees/isogg/isogg.v15.73.2020.complete.tree"
+
+hg37_yfull:
+  chrom: "Y"
+  hg_snps: "trees/yfull/hg37/yFull.13.hg37.bed"
+  hg_info: "trees/yfull/hg37/yFull.13.hg37.tsv"
+  tree: "trees/yfull/yFull.13.complete.tree"
+
+hg38_ftdna:
+  chrom: "chrY"
+  hg_snps: "trees/ftdna/hg38/ftdnaY.oct25.hg38.bed"
+  hg_info: "trees/ftdna/hg38/ftdnaY.oct25.hg38.tsv"
+  tree: "trees/ftdna/ftdnaY.oct25.complete.tree"
+
+hg38_isogg:
+  chrom: "chrY"
+  hg_snps: "trees/isogg/hg38/isogg.v15.73.2020.hg38.bed"
+  hg_info: "trees/isogg/hg38/isogg.v15.73.2020.hg38.tsv"
+  tree: "trees/isogg/isogg.v15.73.2020.complete.tree"
+
+hg38_yfull:
+  chrom: "chrY"
+  hg_snps: "trees/yfull/hg38/yFull.13.hg38.bed"
+  hg_info: "trees/yfull/hg38/yFull.13.hg38.tsv"
+  tree: "trees/yfull/yFull.13.complete.tree"

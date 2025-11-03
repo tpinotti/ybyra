@@ -2,15 +2,24 @@ import pandas as pd
 from itertools import combinations
 import glob
 
+configfile: "config.yaml"
+
 ## --------------------------------------------------------------------------------
 ## global parameters from config file
-PREFIX = config["prefix"] ## prefix for output files
+
 REF = config["ref"] ## path to reference genomes in .fasta format
+PREFIX = config["prefix"] ## prefix for output files
 MQ = config["MQ"] ## minimum mapping quality
-HG_SNPS = config["hg_snps"] ## BED file with haplogroup SNP positions
-HG_INFO = config["hg_info"] ## haplogroup info table
-TREE = config["tree"] ## path to the tree file
-CHROM = config["chrom"]
+
+# Specific build and tree:
+# - BED file with haplogroup SNP positions
+# - haplogroup info table
+# - path to the tree file
+# - name of the Y chromosome in the reference genome
+HG_SNPS = config[config["build"] + "_" + config["tree"]]["hg_snps"]
+HG_INFO = config[config["build"] + "_" + config["tree"]]["hg_info"]
+TREE    = config[config["build"] + "_" + config["tree"]]["tree"]
+CHROM   = config[config["build"] + "_" + config["tree"]]["chrom"]
 
 ## --------------------------------------------------------------------------------
 ## helpers
