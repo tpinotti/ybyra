@@ -68,7 +68,9 @@ rule get_vcf:
     shell:
         """
         echo -e {params.sm} > vcf/{params.sm}.samples.txt
-        bcftools mpileup -B -q {MQ} -f {REF} -r {CHROM} --ignore-RG {input} | bcftools reheader -s vcf/{params.sm}.samples.txt | bcftools call -Am -Oz --ploidy 1 > {output}
+        bcftools mpileup -B -q {MQ} -f {REF} -r {CHROM} --ignore-RG {input} \
+            | bcftools reheader -s vcf/{params.sm}.samples.txt \
+            | bcftools call -Am -Oz --ploidy 1 > {output}
         """
 
 rule index_vcf:
@@ -93,7 +95,11 @@ rule get_alleles:
         "envs/ybyra.yaml"
     shell:
         """
-        bcftools query -T {HG_SNPS} -e 'TYPE=="indel"' -f '%POS\t%REF\t%ALT\t%DP\t%QUAL\t%DP4\t[%TGT]\n' {input.vcf} | gzip > {output}
+        bcftools query \
+            -T {HG_SNPS} \
+            -e 'TYPE=="indel"' \
+            -f '%POS\t%REF\t%ALT\t%DP\t%QUAL\t%DP4\t[%TGT]\n' \
+            {input.vcf} | gzip > {output}
         """
 
 rule Ytree:
@@ -108,7 +114,13 @@ rule Ytree:
     conda:
         "envs/ybyra.yaml"
     shell:
-       "python src/ytree.py --lib {params.lib} --alleles {input} --out calls/{params.sm} --snpinfo {HG_INFO}"
+        """
+        python {workflow.basedir}/scripts/ytree.py \
+            --lib {params.lib} \
+            --alleles {input} \
+            --out calls/{params.sm} \
+            --snpinfo {HG_INFO}
+        """
 
 rule Yplace:
     input:
@@ -120,7 +132,9 @@ rule Yplace:
     conda:
         "envs/ybyra.yaml"
     shell:
-        "python src/yplace.py {params.damage} {TREE} {input.calls} {output}"
+        """
+        python {workflow.basedir}/scripts/yplace.py {params.damage} {TREE} {input.calls} {output}
+        """
 
 rule aggregate_yplace:
     input:
@@ -130,7 +144,9 @@ rule aggregate_yplace:
     conda:
         "envs/ybyra.yaml"
     shell:
-        "python src/ysummary.py {input} > {output}"
+        """
+        python {workflow.basedir}/scripts/ysummary.py {input} > {output}
+        """
 
 rule plot_aggregate:
     input:
@@ -140,7 +156,9 @@ rule plot_aggregate:
     conda:
         "envs/ybyra.yaml"
     shell:
-        "python src/yplot.py {input} {output}"
+        """
+        python {workflow.basedir}/scripts/yplot.py {input} {output}
+        """
 
 rule plot_scoreties:
     input:
@@ -150,4 +168,6 @@ rule plot_scoreties:
     conda:
         "envs/ybyra.yaml"
     shell:
-        "python src/yplot.py scoreties.yplace {output}"
+        """
+        python {workflow.basedir}/scripts/yplot.py scoreties.yplace {output}
+        """
