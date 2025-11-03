@@ -133,5 +133,3 @@ rule plot_scoreties:
         "scoreties.pdf"
     shell:
         "python src/yplot.py scoreties.yplace {output}"
-
-
