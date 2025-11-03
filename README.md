@@ -15,12 +15,12 @@ With ybyra you can:
 
 To use ybyra you need:
 
-- `python 3` (with `pandas`)
+- `python <= 3.12` (with `pandas`)
 - `snakemake`
 - `bcftools`
-- `ete3` (only for plotting)
-- A BAM file
+- `ete3 <= 3.1.3` (only for plotting)
 
+A conda env file with these dependencies is provided in `workflow/envs/ybyra.yaml`. Use for instance `micromamba create -f workflow/envs/ybyra.yaml -n ybyra` (or your preferred conda-like tool) to create an environment, and `micromamba activate ybyra` to activate it prior to running the steps explained below.
 
 ## Getting Started
 
@@ -35,10 +35,10 @@ Prepare a tab-separated `units.tsv` file, listing your samples and bam paths:
 
 ```
 sampleId    bam
-Kennewick	/projects/bam/rasmussen2015/Kennewick.bam	
+Kennewick	/projects/bam/rasmussen2015/Kennewick.bam
 ```
 
-- `sampleId`: individual name  
+- `sampleId`: individual name
 - `bam`: path to the BAM file
 
 
@@ -58,7 +58,7 @@ The `configs/` folder looks like this:
 ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
 
-In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `configs/hg37.ftdna.yml`. 
+In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `configs/hg37.ftdna.yml`.
 
 
 We then need to update the corresponding line in the config with the path to the human reference genome hg37 in your system. If your reference genome for some reason does not use Y (or chrY for hg38) to denote the Y-chromosome, a quick workaround is to modify the 'chrom' line accordingly.
@@ -160,7 +160,7 @@ This is the summary output table. Columns:
 -  `tree_score_below_50`:  Low confidence placement (low-coverage)
 - `step_rule`:  Higher scoring nodes failed the 5 step rule
 
-If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `src/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.   
+If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `src/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.
 
 ### `aggregate.pdf`
 
@@ -274,7 +274,3 @@ This is ybyra v0.3 (30/10/25).
 If you find this useful, for now you can cite ybyra as:
 
 https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2
-
-
-
-
