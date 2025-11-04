@@ -54,7 +54,7 @@ Kennewick	/projects/bam/rasmussen2015/Kennewick.bam
 
 ### 4. Create your configuration file
 
-Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
+Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome the BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
 In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
@@ -63,7 +63,7 @@ In this example, our bams are mapped to hg37 and we would like to use Family Tre
 
 ### 5. (Optional) Enable Ancient DNA damage filter
 
-Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your chosen config file. If you set `damage_filter` to `true`, ybyra will call haplogroups excluding all SNPs flagged as potentially deriving from ancient DNA damage.
+Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your config file. If you set `damage_filter` to `true`, ybyra will call haplogroups excluding all SNPs flagged as potentially deriving from ancient DNA damage.
 
 As the damage profile is dependent on library type, users must report whether libraries were `ds` (double-stranded), `ss` (single-stranded) or `both` (both library types in the bam file or unknown; default).
 
@@ -73,11 +73,14 @@ If `damage_filter` is set to `false`, ybyra will still flag SNPs as damaged, but
 ### 6. Run ybyra
 
 At this stage, the working directory should contain two files, `config.yaml` and `units.tsv`.
-Once everything is set up, you can run the workflow, for example, using 12 threads, like this:
+Once everything is set up, you can run the workflow from the ybyra directory, for example, using 12 threads, like this:
 
 ```
-snakemake -s ybyra.v03.smk --configfile config/hg37/hg37.ftdna.yml --cores 12
+cd /path/to/ybyra
+snakemake --cores 12 --directory /path/to/my_analysis
 ```
+
+That is, we run ybyra while in the directory with the code, and then use the `--directory` option of snakemake to point to the working directory (here assuming `my_analysis` as above, but replace as needed). This is where result files will then be produced, as explained in the following.
 
 
 ## Genotype Calling and Ancient DNA Damage
@@ -235,7 +238,7 @@ Additional outputs per sample are generated across different folders:
 
 ## Other useful files
 
-The `trees/` directory includes complete tree structures for the three topologies, along with SNP lists and their node placements.
+The `trees/` directory in the main code directory includes complete tree structures for the three topologies, along with SNP lists and their node placements.
 
 SNPs excluded from analysis (non-unique or outside the 10 Mb region) are listed in `trees/*/hg38/discarded/`.
 
@@ -246,9 +249,9 @@ Liftover from hg38 to hg37 was performed using CrossMap (https://github.com/ligu
 
 Thanks to Lucas Czech and Martin Sikora for code and ideas, and to Hugh McColl, Teemu and Armando for helpful suggestions and comments.
 
- We also thank ISOGG (https://isogg.org),  yFull (https://www.yfull.com) and FamilyTree DNA (https://discover.familytreedna.com) for making their tree publicly available for the community.
+We also thank ISOGG (https://isogg.org),  yFull (https://www.yfull.com) and FamilyTree DNA (https://discover.familytreedna.com) for making their tree publicly available for the community.
 
-Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk
+Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk, or open an [Issue](https://github.com/tpinotti/ybyra/issues) here on GitHub.
 
 ## Citation
 
