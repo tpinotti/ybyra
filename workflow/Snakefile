@@ -1,6 +1,6 @@
 import pandas as pd
 from itertools import combinations
-import glob
+import glob, os
 
 configfile: "config.yaml"
 
@@ -16,10 +16,12 @@ MQ = config["MQ"] ## minimum mapping quality
 # - haplogroup info table
 # - path to the tree file
 # - name of the Y chromosome in the reference genome
-HG_SNPS = config[config["build"] + "_" + config["tree"]]["hg_snps"]
-HG_INFO = config[config["build"] + "_" + config["tree"]]["hg_info"]
-TREE    = config[config["build"] + "_" + config["tree"]]["tree"]
-CHROM   = config[config["build"] + "_" + config["tree"]]["chrom"]
+# We use paths relative to the project root dir here.
+REF_ID  = config["build"] + "_" + config["tree"]
+HG_SNPS = os.path.join( workflow.basedir, '..', config[REF_ID]["hg_snps"] )
+HG_INFO = os.path.join( workflow.basedir, '..', config[REF_ID]["hg_info"] )
+TREE    = os.path.join( workflow.basedir, '..', config[REF_ID]["tree"] )
+CHROM   = config[REF_ID]["chrom"]
 
 ## --------------------------------------------------------------------------------
 ## helpers
