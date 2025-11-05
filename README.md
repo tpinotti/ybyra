@@ -51,12 +51,13 @@ Kennewick	/projects/bam/rasmussen2015/Kennewick.bam
 - `sampleId`: individual name
 - `bam`: path to the BAM file
 
+Note that bam files need to be indexed.
 
 ### 4. Create your configuration file
 
 Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome the BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
-In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013, and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
+In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013 (10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
 In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
 
@@ -148,7 +149,7 @@ This is the summary output table. Columns:
 -  `tree_score_below_50`:  Low confidence placement (low-coverage)
 - `step_rule`:  Higher scoring nodes failed the 5 step rule
 
-If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `src/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.
+If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `workflow/scripts/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.
 
 ### `aggregate.pdf`
 
@@ -242,7 +243,7 @@ The `trees/` directory in the main code directory includes complete tree structu
 
 SNPs excluded from analysis (non-unique or outside the 10 Mb region) are listed in `trees/*/hg38/discarded/`.
 
-Liftover from hg38 to hg37 was performed using CrossMap (https://github.com/liguowang/CrossMap). Code is available at`liftover/liftoverY.py`. SNPs failing liftover are listed under  `trees/*/hg37/liftoverfail/`.
+Liftover from hg38 to hg37 was performed using CrossMap (https://github.com/liguowang/CrossMap). Code is available at`trees/liftover/liftoverY.py`. SNPs failing liftover are listed under  `trees/*/hg37/liftoverfail/`.
 
 
 ## Acknowledgement
