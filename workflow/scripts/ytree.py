@@ -12,33 +12,20 @@ def depth_filter(row):
 
 #
 #	Damage filter
-#	Check if damage depending on lib type and if majority without potentially damaged reads
+#	Check if damage depending on lib type
 #
 
 def assess_damage(row, lib_type):
     x, y, w, z = map(int, row['dp4'].split(','))
     
     if row['mutation'] == 'C>T':
-        if lib_type in ['ss', 'both']:
-            return 'yes'
-        elif lib_type == 'ds':
-            if y + z == 0:
-                return 'yes'
-            elif (y / (y + z) > 0.7 or z / (y + z) > 0.7):
-                return 'no'
-            else:
-                return 'yes'
+		return 'yes'
     
     elif row['mutation'] == 'G>A':
         if lib_type == 'ss':
             return 'no'
         elif lib_type in ['ds', 'both']:
-            if x + w == 0:
-                return 'yes'
-            elif (x / (x + w) > 0.7 or w / (x + w) > 0.7):
-                return 'no'
-            else:
-                return 'yes'
+			return 'yes'
     
     return 'no'
 
