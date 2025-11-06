@@ -2,34 +2,39 @@
 #     User settings
 # ============================================================
 
+# Name of units table listing the bam files of your samples.
+# See the [README](https://github.com/tpinotti/ybyra) for the format.
+units: "units.tsv"
+
 # Reference genome fasta file that the bam files are mapped against.
 # Needs to be indexed already, e.g., with `samtools faidx genome.fa`.
 # Note that this needs to be either hg37 or hg38, and the "build"
 # setting below needs to be changed accordingly as well.
 # We require this to be present, to avoid re-downloading it.
 # The bam files are mapped against this, so it should be available anyway.
-ref: "/path/to/reference/genome"
+ref_genome: "/path/to/reference/genome"
 
-# Name of units table listing the bam files.
-units: "units.tsv"
-
-# Human reference genome build, choose one of "hg37" or "hg38",
-# depending on the reference genome you selected above.
-build: "hg38"
-
-# SNP tree to use as reference,
-# choose one of "isogg", "yfull", or "ftdna"
-# for the ISOGG, yFull, or FamilyTree DNA tree.
-tree: "isogg"
+# The reference dataset (SNPs and tree) to use.
+#
+# We offer pre-configured data out of the box for the human reference genome
+# builds "hg37" and "hg38", on the ISOGG, yFull, and FamilyTree DNA tree
+# ("isogg", "yfull", or "ftdna"). In these cases, simply enter one of
+# "hg37_ftdna", "hg37_isogg", "hg37_yfull", "hg38_ftdna", "hg38_isogg", "hg38_yfull"
+# here. Note that the reference genome choice needs to match the above `ref_genome`.
+#
+# Alternatively, you can provide a custom set of SNP and tree files.
+# In this case, enter "custom" here, and edit the `custom` block below as needed.
+ref_data: "hg38_isogg"
 
 # Run the Y-placement with an additional damage filter,
-# choose "true" or "false".
+# choose `true` or `false`.
 damage_filter: false
 
 # Library build:
 #  - "ds" for double-stranded,
 #  - "ss" for single-stranded,
-#  - "both" if both were merged in bam
+#  - "both" if both were merged in bam.
+# See the main README for details.
 lib_type: "both"
 
 # Prefix for output files. It's actually a suffix though. Don't ask.
@@ -39,41 +44,69 @@ prefix: "ybyra"
 MQ: 30
 
 # ============================================================
-#     Internal settings (no need to change)
+#     Reference data
 # ============================================================
+
+# When selecting `ref_data: "custom"` above, you need to change
+# this block here for your particular reference SNPs and tree.
+# We provide an example here in form of the horse Y chromosome.
+# This currently consists of 764 contigs instead of a fully
+# assembled Y chromosome.
+custom:
+  # The Y chromosome or contigs in the reference genome.
+  # If your reference genome has a single Y chromosome entry,
+  # simply provide its name (as in the fasta file) here.
+  # Alternatively, if the chromosome is not fully assembled,
+  # provide a file with the contigs here (as is the case in our
+  # horse example data here).
+  chrom: "trees/horse/Y.Horse_LipY764.contigs"
+
+  # Provide a bed file of the haplogroup SNP positions.
+  snps: "trees/ftdna/hg37/ftdnaY.oct25.hg37.bed"
+
+  # Provide an info file describing the haplogroup SNPs.
+  info: "trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv"
+
+  # Provide a tree (as parent-child entries).
+  tree: "trees/ftdna/ftdnaY.oct25.complete.tree"
+
+# Below are our pre-configured human references.
+# They follow the same format as the above `custom` block.
+# Usually, you do not need to change those, and instead simply
+# use the above `ref_data` setting to select one of them.
 
 hg37_ftdna:
   chrom: "Y"
-  hg_snps: "trees/ftdna/hg37/ftdnaY.oct25.hg37.bed"
-  hg_info: "trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv"
+  snps: "trees/ftdna/hg37/ftdnaY.oct25.hg37.bed"
+  info: "trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv"
   tree: "trees/ftdna/ftdnaY.oct25.complete.tree"
 
 hg37_isogg:
   chrom: "Y"
-  hg_snps: "trees/isogg/hg37/isogg.v15.73.2020.hg37.bed"
-  hg_info: "trees/isogg/hg37/isogg.v15.73.2020.hg37.tsv"
+  snps: "trees/isogg/hg37/isogg.v15.73.2020.hg37.bed"
+  info: "trees/isogg/hg37/isogg.v15.73.2020.hg37.tsv"
   tree: "trees/isogg/isogg.v15.73.2020.complete.tree"
 
 hg37_yfull:
   chrom: "Y"
-  hg_snps: "trees/yfull/hg37/yFull.13.hg37.bed"
-  hg_info: "trees/yfull/hg37/yFull.13.hg37.tsv"
+  snps: "trees/yfull/hg37/yFull.13.hg37.bed"
+  info: "trees/yfull/hg37/yFull.13.hg37.tsv"
   tree: "trees/yfull/yFull.13.complete.tree"
 
 hg38_ftdna:
   chrom: "chrY"
-  hg_snps: "trees/ftdna/hg38/ftdnaY.oct25.hg38.bed"
-  hg_info: "trees/ftdna/hg38/ftdnaY.oct25.hg38.tsv"
+  snps: "trees/ftdna/hg38/ftdnaY.oct25.hg38.bed"
+  info: "trees/ftdna/hg38/ftdnaY.oct25.hg38.tsv"
   tree: "trees/ftdna/ftdnaY.oct25.complete.tree"
 
 hg38_isogg:
   chrom: "chrY"
-  hg_snps: "trees/isogg/hg38/isogg.v15.73.2020.hg38.bed"
-  hg_info: "trees/isogg/hg38/isogg.v15.73.2020.hg38.tsv"
+  snps: "trees/isogg/hg38/isogg.v15.73.2020.hg38.bed"
+  info: "trees/isogg/hg38/isogg.v15.73.2020.hg38.tsv"
   tree: "trees/isogg/isogg.v15.73.2020.complete.tree"
 
 hg38_yfull:
   chrom: "chrY"
-  hg_snps: "trees/yfull/hg38/yFull.13.hg38.bed"
-  hg_info: "trees/yfull/hg38/yFull.13.hg38.tsv"
+  snps: "trees/yfull/hg38/yFull.13.hg38.bed"
+  info: "trees/yfull/hg38/yFull.13.hg38.tsv"
   tree: "trees/yfull/yFull.13.complete.tree"

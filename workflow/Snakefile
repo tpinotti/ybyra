@@ -1,27 +1,51 @@
 import pandas as pd
 from itertools import combinations
 import glob, os
+from pathlib import Path
 
 configfile: "config.yaml"
 
 ## --------------------------------------------------------------------------------
 ## global parameters from config file
 
-REF = config["ref"] ## path to reference genomes in .fasta format
+REF_GENOME = config["ref_genome"] ## path to reference genomes in .fasta format
 PREFIX = config["prefix"] ## prefix for output files
 MQ = config["MQ"] ## minimum mapping quality
+
+# We use paths relative to the project root dir here if paths are relative,
+# accounting for them either being in the working dir (perferred), or in the
+# source dir if not found in the working dir.
+# That should allow maximum flexibility and stability for users.
+def get_ref_file_path( inpath ):
+    # Test for abs path or path in working dir.
+    # If not found, return a path relative to the source dir.
+    if os.path.isabs(inpath) or os.path.isfile(inpath):
+        return inpath
+    else:
+        return os.path.join( workflow.basedir, '..', inpath )
 
 # Specific build and tree:
 # - BED file with haplogroup SNP positions
 # - haplogroup info table
 # - path to the tree file
 # - name of the Y chromosome in the reference genome
-# We use paths relative to the project root dir here.
-REF_ID  = config["build"] + "_" + config["tree"]
-HG_SNPS = os.path.join( workflow.basedir, '..', config[REF_ID]["hg_snps"] )
-HG_INFO = os.path.join( workflow.basedir, '..', config[REF_ID]["hg_info"] )
-TREE    = os.path.join( workflow.basedir, '..', config[REF_ID]["tree"] )
-CHROM   = config[REF_ID]["chrom"]
+REF_ID  = config["ref_data"]
+if REF_ID not in config:
+    raise ValueError(
+        "Selected `ref_data: {REF_ID}` is not a valid value. "
+        "Either use one of our pre-configured human references, "
+        "or specify `ref_data: custom`, and provide your own."
+    )
+
+REF_SNPS = get_ref_file_path( config[REF_ID]["snps"] )
+REF_INFO = get_ref_file_path( config[REF_ID]["info"] )
+REF_TREE = get_ref_file_path( config[REF_ID]["tree"] )
+CHROM    = get_ref_file_path( config[REF_ID]["chrom"] )
+if not os.path.isfile(CHROM):
+    # If the provided chrom is not a file,
+    # we assume it to be a single chrom name,
+    # and just reload the config entry.
+    CHROM = config[REF_ID]["chrom"]
 
 ## --------------------------------------------------------------------------------
 ## helpers
@@ -57,15 +81,18 @@ rule all:
 
 ## --------------------------------------------------------------------------------
 ## rules
+
 rule get_y_bam:
     input:
         get_bam
     output:
         "bam/Y.{sample}." + PREFIX + ".bam"
+    params:
+        regions=lambda wc: f"-L {CHROM}" if Path(CHROM).is_file() else CHROM
     conda:
         "envs/ybyra.yaml"
     shell:
-        "samtools view -q{MQ} -F 4 -bh {input} {CHROM} > {output}"
+        "samtools view -q{MQ} -F 4 -bh {input} {params.regions}  > {output}"
 
 rule get_vcf:
     input:
@@ -73,13 +100,14 @@ rule get_vcf:
     output:
         "vcf/Y.{sample}." + PREFIX + ".vcf.gz"
     params:
-        sm="{sample}"
+        sm=lambda wc: wc.sample,
+        regions=lambda wc: f"-R {CHROM}" if Path(CHROM).is_file() else f"-r {CHROM}"
     conda:
         "envs/ybyra.yaml"
     shell:
         """
         echo -e {params.sm} > vcf/{params.sm}.samples.txt
-        bcftools mpileup -B -q {MQ} -f {REF} -r {CHROM} --ignore-RG {input} \
+        bcftools mpileup -B -q {MQ} -f {REF_GENOME} {params.regions} --ignore-RG {input} \
             | bcftools reheader -s vcf/{params.sm}.samples.txt \
             | bcftools call -Am -Oz --ploidy 1 > {output}
         """
@@ -107,7 +135,7 @@ rule get_alleles:
     shell:
         """
         bcftools query \
-            -T {HG_SNPS} \
+            -T {REF_SNPS} \
             -e 'TYPE=="indel"' \
             -f '%POS\t%REF\t%ALT\t%DP\t%QUAL\t%DP4\t[%TGT]\n' \
             {input.vcf} | gzip > {output}
@@ -130,7 +158,7 @@ rule Ytree:
             --lib {params.lib} \
             --alleles {input} \
             --out calls/{params.sm} \
-            --snpinfo {HG_INFO}
+            --snpinfo {REF_INFO}
         """
 
 rule Yplace:
@@ -144,7 +172,8 @@ rule Yplace:
         "envs/ybyra.yaml"
     shell:
         """
-        python {workflow.basedir}/scripts/yplace.py {params.damage} {TREE} {input.calls} {output}
+        python {workflow.basedir}/scripts/yplace.py \
+            {params.damage} {REF_TREE} {input.calls} {output}
         """
 
 rule aggregate_yplace:
