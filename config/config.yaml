@@ -43,6 +43,11 @@ prefix: "ybyra"
 # Mapping quality filter applied to the bam files.
 MQ: 30
 
+# Step size for our "5 step rule" heuristic. This has been tested
+# on the human reference tree, but might need to be adjusted
+# for larger trees with more dense sampling of reference individuals.
+step_size: 5
+
 # ============================================================
 #     Reference data
 # ============================================================

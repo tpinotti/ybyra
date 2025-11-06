@@ -181,11 +181,14 @@ rule aggregate_yplace:
         yplacefiles
     output:
         aggfile
+    params:
+        step_size = config["step_size"]
     conda:
         "envs/ybyra.yaml"
     shell:
         """
-        python {workflow.basedir}/scripts/ysummary.py {input} > {output}
+        python {workflow.basedir}/scripts/ysummary.py \
+            {input} --step-size {params.step_size} > {output}
         """
 
 rule plot_aggregate:
