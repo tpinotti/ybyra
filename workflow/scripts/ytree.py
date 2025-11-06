@@ -12,34 +12,21 @@ def depth_filter(row):
 
 #
 #	Damage filter
-#	Check if damage depending on lib type and if majority without potentially damaged reads
+#	Check if damage depending on lib type
 #
 
 def assess_damage(row, lib_type):
     x, y, w, z = map(int, row['dp4'].split(','))
-    
+
     if row['mutation'] == 'C>T':
-        if lib_type in ['ss', 'both']:
-            return 'yes'
-        elif lib_type == 'ds':
-            if y + z == 0:
-                return 'yes'
-            elif (y / (y + z) > 0.7 or z / (y + z) > 0.7):
-                return 'no'
-            else:
-                return 'yes'
-    
+        return 'yes'
+
     elif row['mutation'] == 'G>A':
         if lib_type == 'ss':
             return 'no'
         elif lib_type in ['ds', 'both']:
-            if x + w == 0:
-                return 'yes'
-            elif (x / (x + w) > 0.7 or w / (x + w) > 0.7):
-                return 'no'
-            else:
-                return 'yes'
-    
+            return 'yes'
+
     return 'no'
 
 #
@@ -47,7 +34,7 @@ def assess_damage(row, lib_type):
 #
 
 def main(lib_type, out_prefix, alleles_file, snpinfo_file):
-    
+
     snpinfo = pd.read_csv(snpinfo_file, sep='\t')
     alleles = pd.read_csv(alleles_file, sep='\t', names=['position', 'ref', 'alt', 'coverage', 'qual', 'dp4', 'geno'])
 
@@ -55,7 +42,7 @@ def main(lib_type, out_prefix, alleles_file, snpinfo_file):
     derived_calls['state'] = 'derived'
     flt_derived_calls = derived_calls[derived_calls.apply(depth_filter, axis=1)]
     nopass_derived_calls = derived_calls[~derived_calls.index.isin(flt_derived_calls.index)]
-    
+
     ancestral_calls = pd.merge(alleles, snpinfo, left_on=['position', 'geno'], right_on=['position', 'anc'])[['position', 'snpId', 'mutation', 'id', 'parent', 'coverage', 'dp4']]
     ancestral_calls['state'] = 'ancestral'
     flt_ancestral_calls = ancestral_calls[ancestral_calls.apply(depth_filter, axis=1)]
@@ -85,7 +72,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.lib, args.out, args.alleles, args.snpinfo)
-    
-    
-
-

@@ -2,10 +2,6 @@ import sys
 import argparse
 import os
 
-# change step size to check upstream nodes here
-STEP_SIZE = 5
-
-
 def parse_yplace(file):
     best_placement = None
     best_score = float('-inf')
@@ -81,7 +77,7 @@ def has_upstream_support(node, all_nodes, step_size):
     return False
 
 
-def main(files):
+def main(files, step_size=5):
     with open("aggregate.yplace", 'w') as out:
         out.write("individual\toptplacement\ttree_score\tflag\ttree_path\n")
 
@@ -94,7 +90,7 @@ def main(files):
     with open("unstabledownstream.yplace", 'w') as out:
         out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
 
-    with open(f"step{STEP_SIZE}nopass.yplace", 'w') as out:
+    with open(f"step{step_size}nopass.yplace", 'w') as out:
         out.write("individual\tid\tscore\ttree_path\n")
 
     with open("fail.yplace", 'w') as out:
@@ -102,7 +98,7 @@ def main(files):
 
     for file in files:
         individual = os.path.basename(file).replace(".yplace", "")
-        
+
         if not os.path.getsize(file):
             continue
 
@@ -149,7 +145,7 @@ def main(files):
             if score < 10:
                 break  # label as fail
 
-            if has_upstream_support(node, all_nodes, STEP_SIZE):
+            if has_upstream_support(node, all_nodes, step_size):
                 if node != best_placement:
                     step_rule_applied = True
                 best_placement = node
@@ -158,7 +154,7 @@ def main(files):
                 passed = True
                 break
             else:
-                with open(f"step{STEP_SIZE}nopass.yplace", 'a') as out:
+                with open(f"step{step_size}nopass.yplace", 'a') as out:
                     out.write(f"{individual}\t{node}\t{score}\t{path}\n")
 
         if not passed:
@@ -184,7 +180,12 @@ def main(files):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get optimal placement for multiple yplace files.")
     parser.add_argument("files", nargs='+', help="List of yplace output files to aggregate")
+    parser.add_argument(
+        "--step-size",
+        type=int,
+        default=5,
+        help="Step size to check upstream nodes (default: 5)"
+    )
     args = parser.parse_args()
 
-    main(args.files)
-
+    main(args.files, step_size=args.step_size)
