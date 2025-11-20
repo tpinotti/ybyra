@@ -200,6 +200,7 @@ rule plot_aggregate:
         "envs/ybyra.yaml"
     shell:
         """
+        export QT_QPA_PLATFORM=offscreen
         python {workflow.basedir}/scripts/yplot.py {input} {output}
         """
 
@@ -212,5 +213,6 @@ rule plot_scoreties:
         "envs/ybyra.yaml"
     shell:
         """
+        export QT_QPA_PLATFORM=offscreen
         python {workflow.basedir}/scripts/yplot.py scoreties.yplace {output}
         """
