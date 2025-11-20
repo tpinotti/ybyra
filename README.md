@@ -57,7 +57,7 @@ Note that bam files need to be indexed.
 
 Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome the BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
-In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in Poznik et al. 2013 (10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
+In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in [Poznik et al. 2013](https://doi.org/10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
 In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
 
@@ -124,7 +124,7 @@ ybyra generates two plots:
 - A tree showing the optimal placement for each individual
 - A second tree showing all tied-score placements
 
-Example plots from ancient individuals from Antonio et al. 2019 (10.1126/science.aay6826) are in the `examples/` folder.
+Example plots from ancient individuals from [Antonio et al. 2019](https://doi.org/10.1126/science.aay6826) are in the `examples/` folder.
 
 
 ## Main Output Files
@@ -248,9 +248,9 @@ Liftover from hg38 to hg37 was performed using CrossMap (https://github.com/ligu
 
 ## Acknowledgement
 
-Thanks to Lucas Czech and Martin Sikora for code and ideas, and to Hugh McColl, Teemu and Armando for helpful suggestions and comments.
+Thanks to J. Víctor Moreno Mayar, Teemu ([@teepean](https://github.com/teepean)) and Armando for helpful suggestions and comments.
 
-We also thank ISOGG (https://isogg.org),  yFull (https://www.yfull.com) and FamilyTree DNA (https://discover.familytreedna.com) for making their tree publicly available for the community.
+We also thank ISOGG ([isogg.org](https://isogg.org)),  yFull ([yfull.com](https://www.yfull.com)) and FamilyTree DNA ([discover.familytreedna.com](https://discover.familytreedna.com)) for making their tree publicly available for the community.
 
 Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk, or open an [Issue](https://github.com/tpinotti/ybyra/issues) here on GitHub.
 
