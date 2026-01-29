@@ -38,11 +38,12 @@ lib_type: "both"
 damage_filter: false
 
 # If `damage_filter` above is activated, chose the damage model to assess damage:
-#  - "naive" to simply remove all C>T (and G>A depending on `lib_type` above)
-#  - "uni" for unidirectional damage model (only derived),
-#    that is, remove all derived C>T (or G>A) and keep all ancestral
-#  - "bi" for bidirectional damage (both derived and ancestral),
-#    that is, remove all derived C>T (or G>A) and remove all ancestral T>C (or A>G)
+#  - "naive": considers all C>T (and G>A depending on library type) as damaged
+#  - "uni": unidirecional damage model, considers C>T (and G>A depending on
+#    library type) as damaged only if also derived
+#  - "bi" bidirecional damage model, considers C>T (and G>A depending on library
+#    type) as damaged only if also derived; instead consider T>C (and A>G
+#    depending on library type) as damaged if ancestral
 damage_model: "naive"
 
 # Prefix for output files. It's actually a suffix though. Don't ask.
