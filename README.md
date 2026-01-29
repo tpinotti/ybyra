@@ -66,9 +66,15 @@ In this example, our bams are mapped to hg37 and we would like to use FamilyTree
 
 ### 5. (Optional) Enable Ancient DNA damage filter
 
-Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your config file. If you set `damage_filter` to `true`, ybyra will call haplogroups excluding all SNPs flagged as potentially deriving from ancient DNA damage.
+Finally, ybyra natively has an ancient DNA damage filter. This again is done by editing your config file. If you set `damage_filter` to `true`, ybyra will call haplogroups after excluding SNPs flagged as potentially deriving from ancient DNA damage.
 
 As the damage profile is dependent on library type, users must report whether libraries were `ds` (double-stranded), `ss` (single-stranded) or `both` (both library types in the bam file or unknown; default).
+
+Furthermore, when assessing damage, ybyra supports three different damage models, which can be chosen in the config (`damage_model`):
+
+- `naive` – considers all C>T (and G>A depending on library type) as damaged
+- `uni` – unidirecional damage model. considers C>T (and G>A depending on library type) as damaged only if also derived
+- `bi` – bidirecional damage model. considers C>T (and G>A depending on library type) as damaged only if also derived; instead consider T>C (and A>G depending on library type) as damaged if ancestral.
 
 If `damage_filter` is set to `false`, ybyra will still flag SNPs as damaged, but will not perform any filtering.
 
@@ -90,11 +96,12 @@ That is, we run ybyra while in the directory with the code, and then use the `--
 
 Genotypes are called using `bcftools`, requiring 70% majority to call a variant at any given locus.
 
-SNPs potentially affected by ancient DNA damage are flagged, following library type damage profile and read orientation.
+SNPs potentially affected by ancient DNA damage are flagged, following library type damage profile and damage model:
 
-- 5' C>T (forward – all libraries types)
-- 3' C>T (reverse – only single-stranded libraries)
-- 3' G>A (reverse – only double-stranded libraries)
+- C>T (all libraries types; only if derived in 'unidirectional' and 'bidirectional' damage models)
+- G>A (only double-stranded libraries; only if derived in 'unidirectional' and 'bidirectional' damage models)
+- T>C (all libraries types; only if ancestral in 'bidirectional' damage model)
+- A>G (only double-stranded libraries; only if ancestral in 'bidirectional' damage model)
 
 If a SNP is still supported by a 70% majority after excluding the support from reads potentially affected by damaged, it is not flagged.
 
