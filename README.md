@@ -8,7 +8,7 @@ ybyra is a Snakemake workflow which calls Y-chromosome haplogroups from bam file
 With ybyra you can:
 
 - Call Y-chromosome haplogroups from BAM files mapped to either hg37 or hg38
-- Use either ISOGG, yFull or FamilyTreeDNA (FTDNA) Y-SNP trees
+- Use either ISOGG, YFull or FamilyTreeDNA (FTDNA) Y-SNP trees
 - Apply an optional ancient DNA (aDNA) damage filter
 - Plot phylogenetic placements for all samples
 
@@ -57,9 +57,11 @@ Note that bam files need to be indexed.
 
 Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome the BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
-In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, yFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in [Poznik et al. 2013](https://doi.org/10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
+In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, YFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in [Poznik et al. 2013](https://doi.org/10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
-In this example, our bams are mapped to hg37 and we would like to use Family Tree DNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
+The three available tree topologies are distributed under different licenses, all of which require proper attribution. Users are responsible for ensuring that the appropriate source is credited when a tree is used. Details on licensing and attribution can be found in the configuration file, in the [attribution](https://github.com/tpinotti/ybyra/tree/main#attribution) section of this documentation and in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.
+
+In this example, our bams are mapped to hg37 and we would like to use FamilyTreeDNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
 
 
 ### 5. (Optional) Enable Ancient DNA damage filter
@@ -250,12 +252,25 @@ Liftover from hg38 to hg37 was performed using CrossMap (https://github.com/ligu
 
 Thanks to J. Víctor Moreno Mayar, Teemu ([@teepean](https://github.com/teepean)) and Armando for helpful suggestions and comments.
 
-We also thank ISOGG ([isogg.org](https://isogg.org)),  yFull ([yfull.com](https://www.yfull.com)) and FamilyTree DNA ([discover.familytreedna.com](https://discover.familytreedna.com)) for making their tree publicly available for the community.
+We also thank ISOGG ([isogg.org](https://isogg.org)),  YFull ([yfull.com](https://www.yfull.com)) and FamilyTreeDNA ([discover.familytreedna.com](https://discover.familytreedna.com)) for making their trees available for the community.
 
 Ideas, suggestions and comments are very welcome. You can get in touch at thomaz.pinotti(at)sund.ku.dk, or open an [Issue](https://github.com/tpinotti/ybyra/issues) here on GitHub.
 
+## Attribution
+
+ybyra is published under the [MIT License](https://github.com/tpinotti/ybyra/blob/dev/LICENSE.md).
+
+International Society of Genetic Genealogy (ISOGG) tree is distributed under the [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en) license.
+
+YFull tree is distributed under the [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en) license.
+
+FamilyTreeDNA Y-DNA Haplotree is distributed under the [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en) license.
+
+Details on the licenses can be found in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.
+
+
 ## Citation
 
-If you find this useful, for now you can cite ybyra as:
+If you find ybyra useful, for now you can cite its preprint:
 
-https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2
+[https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2](https://www.biorxiv.org/content/10.1101/2025.11.20.689455v1)
