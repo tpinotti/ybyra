@@ -26,16 +26,24 @@ ref_genome: "/path/to/reference/genome"
 # In this case, enter "custom" here, and edit the `custom` block below as needed.
 ref_data: "hg38_isogg"
 
-# Run the Y-placement with an additional damage filter,
-# choose `true` or `false`.
-damage_filter: false
-
 # Library build:
 #  - "ds" for double-stranded,
 #  - "ss" for single-stranded,
 #  - "both" if both were merged in bam.
 # See the main README for details.
 lib_type: "both"
+
+# Run the Y-placement with an additional damage filter,
+# choose `true` or `false`. If activated, select below `damage_model`.
+damage_filter: false
+
+# If `damage_filter` above is activated, chose the damage model to assess damage:
+#  - "naive" to simply remove all C>T (and G>A depending on `lib_type` above)
+#  - "uni" for unidirectional damage model (only derived),
+#    that is, remove all derived C>T (or G>A) and keep all ancestral
+#  - "bi" for bidirectional damage (both derived and ancestral),
+#    that is, remove all derived C>T (or G>A) and remove all ancestral T>C (or A>G)
+damage_model: "naive"
 
 # Prefix for output files. It's actually a suffix though. Don't ask.
 prefix: "ybyra"

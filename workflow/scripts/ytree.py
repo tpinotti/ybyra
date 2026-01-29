@@ -30,7 +30,7 @@ def assess_damage(row, lib_type, dmg_model):
     #
     #	naive mode – simply remove all C>T (or G>A)
     #
-    
+
     if dmg_model == 'naive':
         if mut in right:
             return 'yes'
@@ -39,7 +39,7 @@ def assess_damage(row, lib_type, dmg_model):
     #
     #	unidirectional mode – remove all derived C>T (or G>A); keep all ancestral
     #
-    	
+
     elif dmg_model == 'uni':
         if mut in right and state == 'derived':
             return 'yes'
@@ -48,13 +48,16 @@ def assess_damage(row, lib_type, dmg_model):
     #
     #	bidirectional mode – remove all derived C>T (or G>A); remove all ancestral T>C (or A>G)
     #
-    
+
     elif dmg_model == 'bi':
         if mut in right and state == 'derived':
             return 'yes'
         if mut in left and state == 'ancestral':
             return 'yes'
         return 'no'
+
+    elif dmg_model != 'none':
+        raise Exception("Invalid damage model provided via --dmg")
 
     return 'no'
 
@@ -95,11 +98,10 @@ def main(lib_type, out_prefix, alleles_file, snpinfo_file, dmg_model):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Match to tree and filter Y-chromosome genotypes")
     parser.add_argument('--lib', choices=['ds', 'ss', 'both'], required=True, help="Library build: 'ds' for double-stranded, 'ss' for single-stranded, 'both' if both were merged in bam")
-    parser.add_argument('--dmg', choices=['naive','uni','bi'], required=True, help="Damage model to assess damage: 'naive' to remove all C>T (and G>A depending on --lib), 'uni' for unidirectional damage model (only derived), 'bi' for bidirectional damage (both derived and ancestral)")
+    parser.add_argument('--dmg', choices=['none','naive','uni','bi'], required=True, help="Damage model to assess damage: 'naive' to remove all C>T (and G>A depending on --lib), 'uni' for unidirectional damage model (only derived), 'bi' for bidirectional damage (both derived and ancestral)")
     parser.add_argument('--out', required=True, help="Output file prefix")
     parser.add_argument('--alleles', required=True, help="Path to the alleles file")
     parser.add_argument('--snpinfo', required=True, help="Path to the SNP info file")
     args = parser.parse_args()
 
     main(args.lib, args.out, args.alleles, args.snpinfo, args.dmg)
-    

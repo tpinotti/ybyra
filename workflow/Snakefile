@@ -150,12 +150,14 @@ rule Ytree:
     params:
        sm="{sample}",
        lib = lambda wildcards: config.get("lib_type", "both")
+       dmg = lambda wildcards: config.get("damage_model", "none")
     conda:
         "envs/ybyra.yaml"
     shell:
         """
         python {workflow.basedir}/scripts/ytree.py \
             --lib {params.lib} \
+            --dmg {params.dmg} \
             --alleles {input} \
             --out calls/{params.sm} \
             --snpinfo {REF_INFO}
