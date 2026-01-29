@@ -1,4 +1,4 @@
-# ybyra: Y-chromosome phylogeny placement tool
+# ybyra: Y-chromosome haplogroup calling using a tree-based scoring method
 
 ybyra is a Snakemake workflow which calls Y-chromosome haplogroups from bam files by using a tree-based scoring of derived and ancestral SNP calls.
 
