@@ -273,4 +273,6 @@ Details on the licenses can be found in the [`trees`](https://github.com/tpinott
 
 If you find ybyra useful, for now you can cite its preprint:
 
-[https://www.biorxiv.org/content/10.1101/2024.03.13.584607v2](https://www.biorxiv.org/content/10.1101/2025.11.20.689455v1)
+> **ybyra: Y-chromosome haplogroup calling using a tree-based scoring method**.<br />
+>  Thomaz Pinotti, Hugh McColl, Martin Sikora, Lucas Czech.<br />
+> *bioRxiv*, DOI:[10.1101/2025.11.20.689455](https://doi.org/10.1101/2025.11.20.689455)
