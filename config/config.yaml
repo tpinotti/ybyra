@@ -22,6 +22,11 @@ ref_genome: "/path/to/reference/genome"
 # "hg37_ftdna", "hg37_isogg", "hg37_yfull", "hg38_ftdna", "hg38_isogg", "hg38_yfull"
 # here. Note that the reference genome choice needs to match the above `ref_genome`.
 #
+# The three available tree topologies are distributed under different licenses,
+# all of which require proper attribution. Users are responsible for ensuring
+# that the appropriate source is credited when a tree is used. See the main
+# README.md for details.
+#
 # Alternatively, you can provide a custom set of SNP and tree files.
 # In this case, enter "custom" here, and edit the `custom` block below as needed.
 ref_data: "hg38_isogg"

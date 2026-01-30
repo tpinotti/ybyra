@@ -59,7 +59,7 @@ Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was whic
 
 In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, YFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in [Poznik et al. 2013](https://doi.org/10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
-The three available tree topologies are distributed under different licenses, all of which require proper attribution. Users are responsible for ensuring that the appropriate source is credited when a tree is used. Details on licensing and attribution can be found in the configuration file, in the [attribution](https://github.com/tpinotti/ybyra/tree/main#attribution) section of this documentation and in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.
+The three available tree topologies are distributed under different licenses, all of which require proper attribution. Users are responsible for ensuring that the appropriate source is credited when a tree is used. Details on licensing and attribution can be found in the [attribution](https://github.com/tpinotti/ybyra/tree/main#attribution) section of this documentation and in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.
 
 In this example, our bams are mapped to hg37 and we would like to use FamilyTreeDNA Y-SNP tree so we use `build: "hg37"` and `tree: "ftdna"` in the config file, and need to update the line in the config with the path to the human reference genome hg37 in your system.
 
@@ -280,7 +280,7 @@ YFull tree is distributed under the [CC BY 4.0](https://creativecommons.org/lice
 
 FamilyTreeDNA Y-DNA Haplotree is distributed under the [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en) license.
 
-Details on the licenses can be found in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.
+Details on the licenses and tree versions can be found in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory README.
 
 
 ## Citation
