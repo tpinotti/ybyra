@@ -1,6 +1,6 @@
 # Y-SNP trees
 
-We offer to chose from several Y-SNP trees. While our ybyra code is published under the [MIT License](https://github.com/tpinotti/ybyra/blob/dev/LICENSE.md), some trees are provided under different licenses. Users are responsible to use and attribute them accordingly.
+We offer to choose from several Y-SNP trees. While our ybyra code is published under the [MIT License](https://github.com/tpinotti/ybyra/blob/dev/LICENSE.md), some trees are provided under different licenses. Users are responsible to use and attribute them accordingly.
 
 You find the license files in the respective subdirectories here.
 
