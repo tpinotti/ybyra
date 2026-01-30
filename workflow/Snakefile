@@ -149,7 +149,7 @@ rule Ytree:
        nopass="calls/{sample}.nopass",
     params:
        sm="{sample}",
-       lib = lambda wildcards: config.get("lib_type", "both")
+       lib = lambda wildcards: config.get("lib_type", "both"),
        dmg = lambda wildcards: config.get("damage_model", "none")
     conda:
         "envs/ybyra.yaml"
