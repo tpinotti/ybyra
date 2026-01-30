@@ -70,11 +70,11 @@ Finally, ybyra natively has an ancient DNA damage filter. This again is done by 
 
 As the damage profile is dependent on library type, users must report whether libraries were `ds` (double-stranded), `ss` (single-stranded) or `both` (both library types in the bam file or unknown; default).
 
-Furthermore, when assessing damage, ybyra supports three different damage models, which can be chosen in the config (`damage_model`):
+Furthermore, when assessing damage, ybyra supports three different damage models. Their difference lies on how ancestral calls are treated. The damage models can be chosen in the config (`damage_model`):
 
 - `naive` – considers all C>T (and G>A depending on library type) as damaged
-- `uni` – unidirecional damage model. considers C>T (and G>A depending on library type) as damaged only if also derived
-- `bi` – bidirecional damage model. considers C>T (and G>A depending on library type) as damaged only if also derived; instead consider T>C (and A>G depending on library type) as damaged if ancestral.
+- `uni` – unidirecional damage model. considers C>T (and G>A depending on library type) as damaged if derived; ancestral calls are never considered damaged
+- `bi` – bidirecional damage model. considers C>T (and G>A depending on library type) as damaged if derived; instead consider T>C (and A>G depending on library type) as damaged if ancestral
 
 If `damage_filter` is set to `false`, ybyra will still flag SNPs as damaged, but will not perform any filtering.
 
@@ -96,14 +96,21 @@ That is, we run ybyra while in the directory with the code, and then use the `--
 
 Genotypes are called using `bcftools`, requiring 70% majority to call a variant at any given locus.
 
-SNPs potentially affected by ancient DNA damage are flagged, following library type damage profile and damage model:
+SNPs potentially affected by ancient DNA damage are flagged, following library type and damage model:
 
-- C>T (all libraries types; only if derived in 'unidirectional' and 'bidirectional' damage models)
-- G>A (only double-stranded libraries; only if derived in 'unidirectional' and 'bidirectional' damage models)
-- T>C (all libraries types; only if ancestral in 'bidirectional' damage model)
-- A>G (only double-stranded libraries; only if ancestral in 'bidirectional' damage model)
+- `damage_filter: false` : uses all SNPs in scoring
 
-If a SNP is still supported by a 70% majority after excluding the support from reads potentially affected by damaged, it is not flagged.
+- `damage_filter: true`; +  `lib_type`: `"both"` or `"dslib"` + `damage_model: "naive"` : excludes from scoring all C>T and G>A SNPs, regardless if derived or ancestral
+
+- `damage_filter: true` + `lib_type: "sslib"` + `damage_model: "naive"` : excludes from scoring all C>T SNPs, regardless if derived or ancestral
+
+- `damage_filter: true` + `lib_type`: `"both"` or `"dslib"` + `damage_model: "uni"` : excludes from scoring all C>T and G>A derived SNPs
+
+- `damage_filter: true` + `lib_type: "sslib"` + `damage_model: "uni"` : excludes from scoring all C>T derived SNPs
+
+- `damage_filter: true` + `lib_type`: `"both"` or `"dslib"` + `damage_model: "bi"` : excludes from scoring all C>T and G>A derived SNPs and all T>C and A>G ancestral SNPs
+
+- `damage_filter: true` + `lib_type: "sslib"` + `damage_model: "bi"` : excludes from scoring all C>T derived SNPs and all T>C ancestral SNPs
 
 
 ## Haplogroup Placement
