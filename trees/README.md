@@ -8,6 +8,8 @@ You find the license files in the respective subdirectories here.
 
 Location: `ftdna`
 
+Version: 2025.10.15
+
 License: [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en)
 
 Website: [familytreedna.com](https://www.familytreedna.com)
@@ -16,6 +18,8 @@ Website: [familytreedna.com](https://www.familytreedna.com)
 
 Location: `isogg`
 
+Version: 15.73
+
 License: [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en)
 
 Website: [isogg.org](https://isogg.org)
@@ -23,6 +27,8 @@ Website: [isogg.org](https://isogg.org)
 ## YFull YTree
 
 Location: `yfull`
+
+Version: 13.05.0
 
 License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en)
 
