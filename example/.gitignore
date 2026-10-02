@@ -1,0 +1,14 @@
+# Reference genome
+hs37d5.genome.tgz
+hs37d5/
+
+# ybyra outputs
+.snakemake/
+bam/
+vcf/
+tables/
+calls/
+yplace/
+*.yplace
+*.pdf
+!expected_aggregate.yplace

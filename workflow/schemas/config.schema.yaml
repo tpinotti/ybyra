@@ -1,0 +1,69 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: ybyra config file, see config/config.yaml for details.
+type: object
+
+$defs:
+  ref_data_block:
+    type: object
+    properties:
+      chrom:
+        type: string
+      snps:
+        type: string
+      info:
+        type: string
+      tree:
+        type: string
+    required: [chrom, snps, info, tree]
+    additionalProperties: false
+
+properties:
+  units:
+    type: string
+  ref_genome:
+    type: string
+  ref_data:
+    type: string
+    enum: [custom, hg37_ftdna, hg37_isogg, hg37_yfull, hg38_ftdna, hg38_isogg, hg38_yfull]
+  lib_type:
+    type: string
+    enum: [ds, ss, both]
+  damage_filter:
+    type: boolean
+  damage_model:
+    type: string
+    enum: [naive, uni, bi]
+  prefix:
+    type: string
+  MQ:
+    type: integer
+    minimum: 0
+  step_size:
+    type: integer
+    minimum: 1
+  custom:
+    $ref: "#/$defs/ref_data_block"
+  hg37_ftdna:
+    $ref: "#/$defs/ref_data_block"
+  hg37_isogg:
+    $ref: "#/$defs/ref_data_block"
+  hg37_yfull:
+    $ref: "#/$defs/ref_data_block"
+  hg38_ftdna:
+    $ref: "#/$defs/ref_data_block"
+  hg38_isogg:
+    $ref: "#/$defs/ref_data_block"
+  hg38_yfull:
+    $ref: "#/$defs/ref_data_block"
+
+required:
+  - units
+  - ref_genome
+  - ref_data
+  - lib_type
+  - damage_filter
+  - damage_model
+  - prefix
+  - MQ
+  - step_size
+additionalProperties: false

@@ -1,0 +1,2 @@
+# Invalid: string instead of boolean.
+damage_filter: "false"

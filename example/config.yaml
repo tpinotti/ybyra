@@ -1,0 +1,14 @@
+# Settings for the example. All other settings are taken
+# from the defaults in `config/config.yaml` of the ybyra code directory.
+
+# Reference genome, reduced to the Y chromosome to keep the example small.
+# See the README for details, and on how to use the full genome instead.
+ref_genome: "ref/hs37d5.Y.fa.gz"
+
+# The samples are mapped to hg37, and we use the FamilyTreeDNA tree.
+ref_data: "hg37_ftdna"
+
+# Ancient DNA: filter SNPs potentially affected by damage.
+lib_type: "both"
+damage_filter: true
+damage_model: "bi"
