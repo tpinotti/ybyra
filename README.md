@@ -57,6 +57,8 @@ Note that bam files need to be indexed.
 
 Then, we'll need to tell ybyra which Y-SNP tree we want to use, as well was which reference genome the BAM files are mapped to. This is done through the config file in `config/config.yaml`. Copy this file to the working directory, keeping the name `config.yaml`. Then, edit it as needed - explanations of all settings are give in the file itself.
 
+Alternatively, the `config.yaml` in the working directory can contain only the settings that differ from the defaults in `config/config.yaml`; all other settings are taken from there. Unknown settings (e.g., typos or settings from outdated config files) are reported as an error.
+
 In particular, the path to the reference genome, as well as its build and the reference SNP tree need to be changed as needed. ybyra offer users three different Y-SNPs tree topologies (ISOGG, YFull and FamilyTreeDNA), which are based on both public and private datasets. As those datasets do not overlap, the tree topology is different. ybyra only uses SNPs occurring inside the 10Mb region defined in [Poznik et al. 2013](https://doi.org/10.1126/science.1237619), and ensures strict treeness for all markers. Information for tree topology and SNPs (included or excluded after filtering) can be found in the `trees/` folder.
 
 The three available tree topologies are distributed under different licenses, all of which require proper attribution. Users are responsible for ensuring that the appropriate source is credited when a tree is used. Details on licensing and attribution can be found in the [attribution](https://github.com/tpinotti/ybyra/tree/main#attribution) section of this documentation and in the [`trees`](https://github.com/tpinotti/ybyra/tree/main/trees) subdirectory.

@@ -2,8 +2,14 @@ import pandas as pd
 from itertools import combinations
 import glob, os
 from pathlib import Path
+from snakemake.utils import validate
 
+# Load the default config, and overwrite with the user config from the working dir,
+# so that users only need to specify the settings that differ from the defaults.
+# The schema rejects unknown keys, so that typos and outdated settings are not ignored.
+configfile: os.path.join(workflow.basedir, "..", "config", "config.yaml")
 configfile: "config.yaml"
+validate(config, "schemas/config.schema.yaml")
 
 ## --------------------------------------------------------------------------------
 ## global parameters from config file
