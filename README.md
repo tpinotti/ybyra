@@ -27,6 +27,8 @@ A conda env file with these dependencies is provided in `workflow/envs/ybyra.yam
 
 ## Getting Started
 
+For a complete, ready-to-run example with ancient DNA samples, see the [`example/`](https://github.com/tpinotti/ybyra/tree/main/example) folder.
+
 ### 1. Get ybyra
 
 To run ybyra, clone this repository or download a stable [release version](https://github.com/tpinotti/ybyra/releases) or the latest update from the green "Code" button above via ["Download ZIP"](https://github.com/tpinotti/ybyra/archive/refs/heads/main.zip).
@@ -142,7 +144,7 @@ ybyra generates two plots:
 - A tree showing the optimal placement for each individual
 - A second tree showing all tied-score placements
 
-Example plots from ancient individuals from [Antonio et al. 2019](https://doi.org/10.1126/science.aay6826) are in the `examples/` folder.
+Example plots from ancient individuals from [Antonio et al. 2019](https://doi.org/10.1126/science.aay6826) are in the `gallery/` folder.
 
 
 ## Main Output Files
