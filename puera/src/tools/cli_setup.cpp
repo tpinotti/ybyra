@@ -29,9 +29,9 @@
 #include "tools/misc.hpp"
 #include "tools/version.hpp"
 
-#include "genesis/utils/core/algorithm.hpp"
-#include "genesis/utils/text/string.hpp"
-#include "genesis/utils/tools/date_time.hpp"
+#include "genesis/util/core/algorithm.hpp"
+#include "genesis/util/text/string.hpp"
+#include "genesis/util/tool/date_time.hpp"
 
 #include <stdexcept>
 #include <unordered_set>
@@ -129,7 +129,7 @@ void print_option_values( CLI::App const* subcommand )
         // Do not add options in the hidden group, using two ways to specify this.
         if(
             option->get_group().empty() ||
-            genesis::utils::to_lower( option->get_group() ) == "hidden"
+            genesis::util::text::to_lower( option->get_group() ) == "hidden"
         ) {
             continue;
         }
@@ -172,8 +172,8 @@ std::function<void()> puera_cli_callback(
         print_option_values( subcommand );
 
         LOG_MSG << "Started "
-                << genesis::utils::current_date() << " "
-                << genesis::utils::current_time()
+                << genesis::util::current_date() << " "
+                << genesis::util::current_time()
         ;
         LOG_BOLD;
 
@@ -182,8 +182,8 @@ std::function<void()> puera_cli_callback(
 
         LOG_BOLD;
         LOG_MSG << "Finished "
-                << genesis::utils::current_date() << " "
-                << genesis::utils::current_time()
+                << genesis::util::current_date() << " "
+                << genesis::util::current_time()
         ;
     };
 }
@@ -196,8 +196,7 @@ void check_unique_command_names_rec( CLI::App const& app, std::unordered_set<std
 {
     auto const name = app.get_name();
 
-    // Do the check. If the group is empty, the command is hidden, for example,
-    // because it is a legacy command created by add_legacy_command(). In that case, skip it.
+    // Do the check. If the group is empty, the command is hidden. In that case, skip it.
     if( ! app.get_group().empty() ) {
         if( names.count( name ) > 0 ) {
             throw std::runtime_error( "puera command name duplicate: " + name );

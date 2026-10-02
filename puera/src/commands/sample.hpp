@@ -1,5 +1,5 @@
-#ifndef PUERA_COMMANDS_COMMANDS_H_
-#define PUERA_COMMANDS_COMMANDS_H_
+#ifndef PUERA_COMMANDS_SAMPLE_H_
+#define PUERA_COMMANDS_SAMPLE_H_
 
 /*
     puera - visualizing y-chromosome samples on trees
@@ -26,25 +26,26 @@
 
 #include "CLI/CLI.hpp"
 
-#include "commands/sample.hpp"
-#include "commands/summary.hpp"
+#include "options/file_output.hpp"
 
-#include "options/global.hpp"
-#include "tools/cli_setup.hpp"
+// =================================================================================================
+//      Options
+// =================================================================================================
+
+class SampleOptions
+{
+public:
+
+    // Output options
+    FileOutputOptions file_output;
+
+};
 
 // =================================================================================================
 //      Functions
 // =================================================================================================
 
-inline void setup_commands( CLI::App& app )
-{
-    // Add all commands.
-    setup_sample( app );
-    setup_summary( app );
-
-    // Add the global options to each of the above subcommands.
-    global_options.add_to_module( app );
-    set_module_help_group( app );
-}
+void setup_sample( CLI::App& app );
+void run_sample( SampleOptions const& options );
 
 #endif // include guard

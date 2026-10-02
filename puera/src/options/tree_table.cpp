@@ -27,13 +27,13 @@
 #include "tools/misc.hpp"
 
 #include "genesis/tree/common_tree/tree.hpp"
-#include "genesis/tree/formats/table/reader.hpp"
-#include "genesis/tree/function/functions.hpp"
-#include "genesis/utils/containers/dataframe.hpp"
-#include "genesis/utils/containers/dataframe/operators.hpp"
-#include "genesis/utils/containers/dataframe/reader.hpp"
-#include "genesis/utils/core/fs.hpp"
-#include "genesis/utils/text/string.hpp"
+#include "genesis/tree/format/table/reader.hpp"
+#include "genesis/tree/function/function.hpp"
+#include "genesis/util/container/dataframe.hpp"
+#include "genesis/util/container/dataframe/operator.hpp"
+#include "genesis/util/container/dataframe/reader.hpp"
+#include "genesis/util/core/fs.hpp"
+#include "genesis/util/text/string.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -41,7 +41,8 @@
 #include <stdexcept>
 
 using namespace genesis::tree;
-using namespace genesis::utils;
+using namespace genesis::util::container;
+using namespace genesis::util::io;
 
 // =================================================================================================
 //      Setup Functions
@@ -142,65 +143,18 @@ void TreeTableOptions::set_tree_branch_length_to_snp_counts(
 //      Internal Functions
 // =================================================================================================
 
-// // Custom hash function for std::pair<std::string, std::string>
-// struct pair_hash {
-//     std::size_t operator()(const std::pair<std::string, std::string>& p) const {
-//         auto hash1 = std::hash<std::string>{}(p.first);
-//         auto hash2 = std::hash<std::string>{}(p.second);
-//         return hash1 ^ (hash2 << 1); // Combine the two hash values
-//     }
-// };
-
-// // Custom equality function for std::pair<std::string, std::string>
-// struct pair_equal {
-//     bool operator()(const std::pair<std::string, std::string>& p1,
-//                     const std::pair<std::string, std::string>& p2) const {
-//         return p1.first == p2.first && p1.second == p2.second;
-//     }
-// };
-
 void TreeTableOptions::read_tree_() const
 {
     if( ! tree_.empty() ) {
         return;
     }
 
-    // LOG_DBG << "read_tree_from_table_file";
-
     // Read the input table into a dataframe.
     auto const sep_char = translate_separator_char( separator_char_opt_ );
     auto reader = DataframeReader<std::string>( sep_char ).row_names_from_first_col( false );
     auto const table = reader.read( from_file( tree_table_opt_.value ));
-    // LOG_DBG << "tree table columns: " << join( table.col_names() );
     auto const& raw_children = table[idx_col_opt_.value].as<std::string>().to_vector();
     auto const& raw_parents  = table[par_col_opt_.value].as<std::string>().to_vector();
 
     tree_ = make_tree_from_parents_table( raw_children, raw_parents );
-
-    // // Make lists that do not contain duplicates.
-    // // Super inefficient, but good enough for now.
-    // std::vector<std::string> child_names;
-    // std::vector<std::string> parent_names;
-    // std::unordered_set<std::pair<std::string, std::string>, pair_hash, pair_equal> duplicates;
-    // for( size_t i = 0; i < raw_children.size(); ++i ) {
-    //     auto cp = std::make_pair( raw_children[i], raw_parents[i] );
-    //     // if( cp.first.empty() || cp.second.empty() ) {
-    //     //     continue;
-    //     // }
-    //     // if( cp.first == "A00" ) {
-    //     //     continue;
-    //     // }
-    //     // if( cp.second.empty() ) {
-    //     //     cp.second = "root";
-    //     // }
-    //     // if( duplicates.count( cp ) > 0 ) {
-    //     //     continue;
-    //     // }
-    //     duplicates.insert( cp );
-    //     child_names.push_back( cp.first );
-    //     parent_names.push_back( cp.second );
-    //
-    //     // LOG_DBG << cp.first << " --> " << cp.second;
-    // }
-    // return make_tree_from_parents_table( child_names, parent_names );
 }

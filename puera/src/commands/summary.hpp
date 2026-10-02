@@ -1,5 +1,5 @@
-#ifndef PUERA_FUNCTIONS_FUNCTIONS_H_
-#define PUERA_FUNCTIONS_FUNCTIONS_H_
+#ifndef PUERA_COMMANDS_SUMMARY_H_
+#define PUERA_COMMANDS_SUMMARY_H_
 
 /*
     puera - visualizing y-chromosome samples on trees
@@ -24,26 +24,28 @@
     Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
-#include "genesis/tree/tree.hpp"
+#include "CLI/CLI.hpp"
 
-#include <functional>
-#include <string>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+#include "options/file_output.hpp"
 
 // =================================================================================================
-//      Helper Functions
+//      Options
 // =================================================================================================
 
-std::vector<double> propagate_edge_values_inwards(
-    genesis::tree::Tree const& tree,
-    std::vector<double> const& edge_values
-);
+class SummaryOptions
+{
+public:
 
-std::vector<double> propagate_edge_snp_counts(
-    genesis::tree::Tree const& tree,
-    std::vector<double> const& edge_snp_counts
-);
+    // Output options
+    FileOutputOptions file_output;
+
+};
+
+// =================================================================================================
+//      Functions
+// =================================================================================================
+
+void setup_summary( CLI::App& app );
+void run_summary( SummaryOptions const& options );
 
 #endif // include guard

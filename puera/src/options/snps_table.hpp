@@ -102,7 +102,6 @@ private:
 
     CliOption<std::string> idx_col_opt_ = "id";
     CliOption<std::string> par_col_opt_ = "parent";
-    // CliOption<std::string> pos_col_opt_ = "position";
     CliOption<std::string> separator_char_opt_ = "tab";
 
 };

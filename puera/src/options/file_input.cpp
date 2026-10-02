@@ -25,17 +25,13 @@
 
 #include "options/global.hpp"
 
-#include "genesis/utils/core/fs.hpp"
-#include "genesis/utils/text/string.hpp"
+#include "genesis/util/core/fs.hpp"
+#include "genesis/util/text/string.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
-
-// #ifdef GENESIS_OPENMP
-// #   include <omp.h>
-// #endif
 
 // =================================================================================================
 //      Setup Functions
@@ -107,7 +103,7 @@ std::vector<std::string> const& FileInputOptions::file_paths() const
     #pragma omp critical(PUERA_FILE_INPUT_PATHS)
     {
         if( resolved_paths_.empty() ) {
-            using namespace genesis::utils;
+            using namespace genesis::util::core;
             for( auto const& path : raw_paths_ ) {
                 if( is_file( path ) ) {
 
@@ -117,12 +113,11 @@ std::vector<std::string> const& FileInputOptions::file_paths() const
 
                     // Get all files in dir.
                     auto list = dir_list_files( path, true, ".*\\." + file_ext_ + "$" );
-                    for( auto const& jplace : list ) {
-                        resolved_paths_.push_back( jplace );
+                    for( auto const& file : list ) {
+                        resolved_paths_.push_back( file );
                     }
 
                 } else {
-                    // throw std::runtime_error( "Not a valid file or directory: " + path );
                     throw CLI::ValidationError(
                         "--" + file_type_ + "-path", "Not a valid file or directory: " + path
                     );
@@ -160,7 +155,8 @@ std::vector<std::string> const& FileInputOptions::raw_file_paths() const
 
 std::vector<std::string> FileInputOptions::base_file_names() const
 {
-    using namespace genesis::utils;
+    using namespace genesis::util::core;
+    using namespace genesis::util::text;
 
     auto paths = file_paths();
     for( auto& path : paths ) {
@@ -175,7 +171,8 @@ std::vector<std::string> FileInputOptions::base_file_names() const
 
 std::string FileInputOptions::base_file_name( size_t index ) const
 {
-    using namespace genesis::utils;
+    using namespace genesis::util::core;
+    using namespace genesis::util::text;
     auto fn = file_basename( file_path( index ));
     if( ends_with( fn, ".gz" ) ) {
         fn.erase( fn.size() - 3 );
@@ -190,40 +187,8 @@ void FileInputOptions::print() const
         type = " " + type;
     }
 
-    // Print list of files, depending on verbosity.
+    // Print the number of files found.
     auto const& files = file_paths();
     LOG_MSG1 << "Found " << files.size() << type << " file"
              << ( files.size() != 1 ? "s" : "" );
-    // LOG_MSG2 << genesis::utils::join( base_file_names(), ", " );
-
-    // auto const& files = file_paths();
-    // if( global_options.verbosity() == 0 ) {
-    //     return;
-    // } else if( global_options.verbosity() == 1 ) {
-    //     std::cout << "Found " << files.size() << type << " file";
-    //     std::cout << ( files.size() > 1 ? "s" : "" ) << ".\n";
-    // } else if( global_options.verbosity() == 2 ) {
-    //     std::cout << "Found " << files.size() << type << " file";
-    //     std::cout << ( files.size() > 1 ? "s" : "" ) << ": ";
-    //     for( auto const& file : files ) {
-    //         if( &file != &files[0] ) {
-    //             std::cout << ", ";
-    //         }
-    //         std::cout << genesis::utils::file_basename( file );
-    //     }
-    //     std::cout << "\n";
-    // } else {
-    //     std::cout << "Found " << files.size() << type << " file";
-    //     std::cout << ( files.size() > 1 ? "s" : "" ) << ":\n";
-    //
-    //     for( auto const& file : files ) {
-    //         std::string rp;
-    //         try{
-    //             rp = genesis::utils::real_path( file );
-    //         } catch(...) {
-    //             rp = file;
-    //         }
-    //         std::cout << "  - " << rp << "\n";
-    //     }
-    // }
 }

@@ -27,12 +27,12 @@
 #include "tools/misc.hpp"
 
 #include "genesis/tree/common_tree/tree.hpp"
-#include "genesis/tree/function/functions.hpp"
-#include "genesis/utils/containers/dataframe.hpp"
-#include "genesis/utils/containers/dataframe/operators.hpp"
-#include "genesis/utils/containers/dataframe/reader.hpp"
-#include "genesis/utils/core/fs.hpp"
-#include "genesis/utils/text/string.hpp"
+#include "genesis/tree/function/function.hpp"
+#include "genesis/util/container/dataframe.hpp"
+#include "genesis/util/container/dataframe/operator.hpp"
+#include "genesis/util/container/dataframe/reader.hpp"
+#include "genesis/util/core/fs.hpp"
+#include "genesis/util/text/string.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -40,7 +40,8 @@
 #include <stdexcept>
 
 using namespace genesis::tree;
-using namespace genesis::utils;
+using namespace genesis::util::container;
+using namespace genesis::util::io;
 
 // =================================================================================================
 //      Setup Functions
@@ -83,12 +84,6 @@ void SnpsTableOptions::add_snps_table_opt_to_app(
         "Column name for the parent id column in the SNPs table."
     );
     par_col_opt_.option->group( group );
-    // pos_col_opt_.option = sub->add_option(
-    //     "--snps-table-position-column",
-    //     pos_col_opt_.value,
-    //     "Column name for the position column in SNP table file."
-    // );
-    // pos_col_opt_->group( group );
 
     // Separator char
     separator_char_opt_.option = sub->add_option(
@@ -108,8 +103,6 @@ void SnpsTableOptions::add_snps_table_opt_to_app(
 std::vector<size_t> SnpsTableOptions::get_snps_per_edge_counts(
     TreeTableOptions const& tree_opts
 ) const {
-    // LOG_DBG << "get_snps_per_edge_counts";
-
     // Create a map of branch names to edge indices, for speed
     auto const& tree = tree_opts.get_tree();
     auto const node_name_to_edge_index = tree_opts.make_node_name_to_edge_index();
@@ -118,117 +111,41 @@ std::vector<size_t> SnpsTableOptions::get_snps_per_edge_counts(
     auto const sep_char = translate_separator_char( separator_char_opt_ );
     auto reader = DataframeReader<std::string>( sep_char ).row_names_from_first_col( false );
     auto const table = reader.read( from_file( snps_table_opt_.value ));
-    // LOG_DBG << "snp table columns: " << join( table.col_names() );
 
-    // Shortcuts for the columsn of the table that we need.
-    // auto const& col_pos = table[pos_col_opt_.value].as<std::string>().to_vector();
+    // Shortcuts for the columns of the table that we need.
     auto const& col_idx = table[idx_col_opt_.value].as<std::string>().to_vector();
     auto const& col_par = table[par_col_opt_.value].as<std::string>().to_vector();
     if( col_idx.size() != col_par.size() ) {
         throw std::runtime_error( "Inconsistent column sizes in SNP table" );
     }
-    // if( col_pos.size() != col_idx.size() || col_pos.size() != col_par.size() ) {
-    //     throw std::runtime_error( "Inconsistent column sizes in SNP table" );
-    // }
 
     // Finally, create a vector of edge indices counting the snps on each edge.
     auto edge_snp_counts = std::vector<size_t>( tree.edge_count() );
-    // size_t cnt = 0;
     for( size_t i = 0; i < col_idx.size(); ++i ) {
         if( col_idx[i].empty() ) {
             LOG_WARN << "Empty SNP table id at position " << i;
             continue;
         }
-
-        // LOG_DBG << col_pos[i];
         if( node_name_to_edge_index.count( col_idx[i] ) == 0 ) {
             throw std::runtime_error(
-                "No child with name " + col_idx[i] //+ " at position " + col_pos[i]
+                "No child with name " + col_idx[i]
             );
         }
-
-        // auto const pos = std::stoul( col_pos[i] );
         auto const edge_index = node_name_to_edge_index.at( col_idx[i] );
         auto const& edge = tree.edge_at( edge_index );
         auto const& parent_name = edge.primary_node().data<CommonNodeData>().name;
         auto const& child_name  = edge.secondary_node().data<CommonNodeData>().name;
         if( parent_name != col_par[i] ) {
             throw std::runtime_error(
-                "Wrong parent name " + parent_name + " instead of " + col_par[i] //+
-                // " at position " + col_pos[i]
+                "Wrong parent name " + parent_name + " instead of " + col_par[i]
             );
         }
         if( child_name != col_idx[i] ) {
             throw std::runtime_error(
-                "Wrong child name " + child_name + " instead of " + col_idx[i] //+
-                // " at position " + col_pos[i]
+                "Wrong child name " + child_name + " instead of " + col_idx[i]
             );
         }
         ++edge_snp_counts[ edge_index ];
-        // ++cnt;
     }
-    // LOG_INFO << "used " << cnt << " entries in snp table";
     return edge_snp_counts;
 }
-
-/*
-std::unordered_map<size_t, size_t> read_snp_to_edge_map(
-    Tree const& tree,
-    std::string const& table_file
-) {
-    LOG_DBG << "read_snp_to_edge_map";
-
-    // Create a map of branch names to edge indices, for speed
-    auto const node_name_to_edge_index = make_node_name_to_edge_index( tree );
-
-    // First read the table containing the snps and branches
-    auto reader = DataframeReader<std::string>( '\t' ).row_names_from_first_col( false );
-    auto const table = reader.read( from_file( table_file ));
-    // LOG_DBG << "snp table columns: " << join( table.col_names() );
-
-    // Shortcuts for the columsn of the table that we need.
-    auto const& col_pos    = table[ "position" ].as<std::string>().to_vector();
-    auto const& col_id     = table[ "id"       ].as<std::string>().to_vector();
-    auto const& col_parent = table[ "parent"   ].as<std::string>().to_vector();
-    if( col_pos.size() != col_id.size() || col_pos.size() != col_parent.size() ) {
-        throw std::runtime_error( "Wrong column sizes" );
-    }
-
-    // Finally, create the map from snp positions to the branch they appear on.
-    std::unordered_map<size_t, size_t> snp_to_edge_index;
-    for( size_t i = 0; i < col_pos.size(); ++i ) {
-        // LOG_DBG << col_pos[i];
-        if( node_name_to_edge_index.count( col_id[i] ) == 0 ) {
-            throw std::runtime_error( "No child with name " + col_id[i] + " at snpID " + col_pos[i] );
-        }
-
-        auto const pos = std::stoul( col_pos[i] );
-        auto const edge_index = node_name_to_edge_index.at( col_id[i] );
-        if( snp_to_edge_index.count( pos ) > 0 ) {
-            // throw std::runtime_error( "Duplicate position: " + col_pos[i] );
-            if( snp_to_edge_index[ pos ] != edge_index ) {
-                throw std::runtime_error(
-                    "Duplicate position " + col_pos[i] + " with different edge indices"
-                );
-            }
-        }
-
-        auto const& parent_name = tree.edge_at( edge_index ).primary_node().data<CommonNodeData>().name;
-        auto const& child_name = tree.edge_at( edge_index ).secondary_node().data<CommonNodeData>().name;
-        if( parent_name != col_parent[i] ) {
-            throw std::runtime_error(
-                "Wrong parent name " + parent_name + " instead of " + col_parent[i] +
-                " at snpID " + col_pos[i]
-            );
-        }
-        if( child_name != col_id[i] ) {
-            throw std::runtime_error(
-                "Wrong child name " + child_name + " instead of " + col_id[i] +
-                " at snpID " + col_pos[i]
-            );
-        }
-        snp_to_edge_index[ pos ] = edge_index;
-    }
-    return snp_to_edge_index;
-}
-*/

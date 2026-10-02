@@ -78,17 +78,6 @@ struct CliOption<std::string>
         return *this;
     }
 
-    // CliOption& operator =( std::string const& val )
-    // {
-    //     value = val;
-    //     return *this;
-    // }
-    //
-    // CliOption& operator =( char const* val )
-    // {
-    //     value = val;
-    //     return *this;
-    // }
 
     std::string  value  = {};
     CLI::Option* option = nullptr;

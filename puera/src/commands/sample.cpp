@@ -1,6 +1,3 @@
-#ifndef PUERA_COMMANDS_VISUALIZE_H_
-#define PUERA_COMMANDS_VISUALIZE_H_
-
 /*
     puera - visualizing y-chromosome samples on trees
     Copyright (C) 2025 Lucas Czech
@@ -24,49 +21,47 @@
     Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
-#include "CLI/CLI.hpp"
+#include "commands/sample.hpp"
 
-#include "options/color_map.hpp"
-#include "options/file_input.hpp"
-#include "options/file_output.hpp"
-#include "options/samples.hpp"
-#include "options/snps_table.hpp"
-#include "options/tree_table.hpp"
-#include "tools/cli_option.hpp"
+#include "options/global.hpp"
+#include "tools/cli_setup.hpp"
 
-#include <limits>
-#include <string>
-#include <vector>
+#include "genesis/util/core/logging.hpp"
+
+#include <memory>
 
 // =================================================================================================
-//      Options
+//      Setup
 // =================================================================================================
 
-class VisualizeOptions
+void setup_sample( CLI::App& app )
 {
-public:
+    // Create the options and subcommand objects.
+    auto options = std::make_shared<SampleOptions>();
+    auto sub = app.add_subcommand(
+        "sample",
+        "Plot the tree scores and placement of individual samples on the tree."
+    );
 
-    // Input options
-    TreeTableOptions tree_table_input;
-    SnpsTableOptions snps_table_input;
-    SamplesOptions   sample_input;
+    // Output
+    options->file_output.add_default_output_opts_to_app( sub );
 
-    // Plot settings
-    ColorMapOptions color_map;
-    CliOption<std::string> color_norm = "linear";
-    // CliOption<double> min_value = std::numeric_limits<double>::quiet_NaN();
-    // CliOption<double> max_value = std::numeric_limits<double>::quiet_NaN();
-
-    // Output options
-    FileOutputOptions  file_output;
-
-};
+    // Set the run function as callback to be called when this subcommand is issued.
+    // Hand over the options by copy, so that their shared ptr stays alive in the lambda.
+    sub->callback( puera_cli_callback(
+        sub,
+        [ options ]() {
+            run_sample( *options );
+        }
+    ));
+}
 
 // =================================================================================================
-//      Functions
+//      Run
 // =================================================================================================
 
-void setup_visualize( CLI::App& app );
-void run_visualize( VisualizeOptions const& options );
-
-#endif // include guard
+void run_sample( SampleOptions const& options )
+{
+    (void) options;
+    LOG_MSG << "The sample command is not yet implemented.";
+}

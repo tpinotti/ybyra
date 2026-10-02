@@ -102,7 +102,6 @@ private:
 
     FileInputOptions samples_opt_;
 
-    // CliOption<std::string> snp_col_opt_ = "snpId";
     CliOption<std::string> idx_col_opt_ = "id";
     CliOption<std::string> par_col_opt_ = "parent";
     CliOption<std::string> stt_col_opt_ = "state";

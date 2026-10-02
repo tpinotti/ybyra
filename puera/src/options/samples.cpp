@@ -27,13 +27,13 @@
 #include "tools/misc.hpp"
 
 #include "genesis/tree/common_tree/tree.hpp"
-#include "genesis/tree/formats/table/reader.hpp"
-#include "genesis/tree/function/functions.hpp"
-#include "genesis/utils/containers/dataframe.hpp"
-#include "genesis/utils/containers/dataframe/operators.hpp"
-#include "genesis/utils/containers/dataframe/reader.hpp"
-#include "genesis/utils/core/fs.hpp"
-#include "genesis/utils/text/string.hpp"
+#include "genesis/tree/format/table/reader.hpp"
+#include "genesis/tree/function/function.hpp"
+#include "genesis/util/container/dataframe.hpp"
+#include "genesis/util/container/dataframe/operator.hpp"
+#include "genesis/util/container/dataframe/reader.hpp"
+#include "genesis/util/core/fs.hpp"
+#include "genesis/util/text/string.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -41,7 +41,8 @@
 #include <stdexcept>
 
 using namespace genesis::tree;
-using namespace genesis::utils;
+using namespace genesis::util::container;
+using namespace genesis::util::io;
 
 // =================================================================================================
 //      Setup Functions
@@ -98,40 +99,10 @@ void SamplesOptions::add_samples_opt_to_app(
 //      Run Functions
 // =================================================================================================
 
-/*
-std::vector<double> SamplesOptions::make_sample_edge_snp_counts(
-    Tree const& tree,
-    std::unordered_map<size_t, size_t> const& snp_to_edge_index,
-    std::string const& table_file
-) {
-    LOG_DBG << "make_sample_edge_snp_counts";
-
-    // Read the table
-    auto reader = DataframeReader<std::string>( '\t' );
-    reader.row_names_from_first_col( false );
-    reader.col_names_from_first_row( false );
-    auto const table = reader.read( from_file( table_file ));
-    auto const& col_pos = table[ 0 ].as<std::string>().to_vector();
-
-    // Prepare the result vector and loop the table
-    auto edge_values = std::vector<double>( tree.edge_count() );
-    for( size_t i = 0; i < table.rows(); ++i ) {
-        // LOG_DBG << col_pos[i];
-        auto const pos = std::stoul( col_pos[i] );
-        if( snp_to_edge_index.count( pos ) == 0 ) {
-            throw std::runtime_error( "Invalid position " + col_pos[i] );
-        }
-        edge_values[snp_to_edge_index.at(pos)] += 1.0;
-    }
-    return edge_values;
-}
-*/
-
 std::vector<double> SamplesOptions::make_sample_edge_snp_counts_derived(
     TreeTableOptions const& tree_opts,
     size_t smp_idx
 ) {
-    // LOG_DBG << "make_sample_edge_snp_counts_derived";
     auto const sample_table_infile = samples_opt_.file_path( smp_idx );
     auto const& tree = tree_opts.get_tree();
 
@@ -142,11 +113,9 @@ std::vector<double> SamplesOptions::make_sample_edge_snp_counts_derived(
     auto const sep_char = translate_separator_char( separator_char_opt_ );
     auto reader = DataframeReader<std::string>( sep_char );
     reader.row_names_from_first_col( false );
-    // reader.col_names_from_first_row( false );
     auto const table = reader.read( from_file( sample_table_infile ));
 
-    // Shortcuts for the columsn of the table that we need.
-    // auto const& col_snpid  = table[ "snpId"  ].as<std::string>().to_vector();
+    // Shortcuts for the columns of the table that we need.
     auto const& col_id     = table[ idx_col_opt_.value ].as<std::string>().to_vector();
     auto const& col_parent = table[ par_col_opt_.value ].as<std::string>().to_vector();
     auto const& col_state  = table[ stt_col_opt_.value ].as<std::string>().to_vector();
@@ -154,26 +123,21 @@ std::vector<double> SamplesOptions::make_sample_edge_snp_counts_derived(
 
     // Prepare the result vector and loop the table
     auto edge_values = std::vector<double>( tree.edge_count(), 0.0 );
-    // size_t cnt = 0;
-    // size_t excl = 0;
     for( size_t i = 0; i < table.rows(); ++i ) {
         if( col_id[i].empty() ) {
-            // LOG_WARN << "empty col_id[i] at " << i;
             continue;
         }
         if( exclude_damage_.value && col_damage[i] == "yes" ) {
-            // ++excl;
             continue;
         }
         if( col_damage[i] != "yes" && col_damage[i] != "no" ) {
-            // LOG_WARN << "col damage: \"" << col_damage[i] << "\" at " << i;
             throw std::runtime_error(
                 "Invalid damage column value \"" + col_damage[i] + "\""
             );
         }
         if( node_name_to_edge_index.count( col_id[i] ) == 0 ) {
             throw std::runtime_error(
-                "No child with name " + col_id[i] //+ " at snpID " + col_snpid[i]
+                "No child with name " + col_id[i]
             );
         }
         auto const edge_index = node_name_to_edge_index.at( col_id[i] );
@@ -182,14 +146,12 @@ std::vector<double> SamplesOptions::make_sample_edge_snp_counts_derived(
         auto const& child_name = edge.secondary_node().data<CommonNodeData>().name;
         if( parent_name != col_parent[i] ) {
             throw std::runtime_error(
-                "Wrong parent name " + parent_name + " instead of " + col_parent[i] //+
-                // " at snpID " + col_snpid[i]
+                "Wrong parent name " + parent_name + " instead of " + col_parent[i]
             );
         }
         if( child_name != col_id[i] ) {
             throw std::runtime_error(
-                "Wrong child name " + child_name + " instead of " + col_id[i] //+
-                // " at snpID " + col_snpid[i]
+                "Wrong child name " + child_name + " instead of " + col_id[i]
             );
         }
 
@@ -198,16 +160,10 @@ std::vector<double> SamplesOptions::make_sample_edge_snp_counts_derived(
         } else if( col_state[i] == "ancestral" || col_state[i] == "-" ) {
             edge_values[edge_index] -= 1.0;
         } else {
-            // LOG_WARN << "col state: \"" << col_state[i] << "\" at " << i;
             throw std::runtime_error(
                 "Invalid state column value \"" + col_state[i] + "\""
             );
         }
-        // ++cnt;
     }
-    // LOG_INFO << "used " << cnt << " rows of sample table";
-    // if( excl > 0 ) {
-    //     LOG_MSG1 << "Excluded " << excl << " rows with damage";
-    // }
     return edge_values;
 }

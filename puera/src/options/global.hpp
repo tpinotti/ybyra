@@ -29,9 +29,9 @@
 #include "tools/cli_option.hpp"
 #include "tools/version.hpp"
 
-#include "genesis/utils/core/logging.hpp"
-#include "genesis/utils/core/options.hpp"
-#include "genesis/utils/threading/thread_pool.hpp"
+#include "genesis/util/core/logging.hpp"
+#include "genesis/util/core/options.hpp"
+#include "genesis/util/threading/thread_pool.hpp"
 
 #include <string>
 #include <vector>
@@ -54,11 +54,7 @@ public:
     void initialize( int const argc, char const* const* argv );
 
     /**
-     * @brief Add the global options to all subcommands of a module.
-     *
-     * This is gappa/grenedalf-specific, as we use the command structure
-     * `gappa/grenedalf module subcommand`.
-     * This function takes a module, and adds the global options to all its subcommands.
+     * @brief Add the global options to all subcommands of the given app or module.
      */
     void add_to_module( CLI::App& module );
 
@@ -93,12 +89,12 @@ public:
     /**
      * @brief Get the global thread pool to use for computations.
      *
-     * Simply forwards to genesis::utils::Options::global_thread_pool(),
+     * Simply forwards to genesis::util::core::Options::global_thread_pool(),
      * but provided here for convenience and in case that we later need to change the pool.
      */
-    std::shared_ptr<genesis::utils::ThreadPool> thread_pool() const
+    std::shared_ptr<genesis::util::threading::ThreadPool> thread_pool() const
     {
-        return genesis::utils::Options::get().global_thread_pool();
+        return genesis::util::core::Options::get().global_thread_pool();
     }
 
     // -------------------------------------------------------------------------

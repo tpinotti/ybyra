@@ -26,7 +26,7 @@
 
 #include "CLI/CLI.hpp"
 
-#include "genesis/utils/io/output_target.hpp"
+#include "genesis/util/io/output_target.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -141,7 +141,7 @@ private:
         CLI::App* sub,
         std::string const& initial_value,
         std::string const& fixname,
-        CLI::Option* target_opt,
+        CLI::Option*& target_opt,
         std::string& target_var
     );
 
@@ -217,7 +217,7 @@ public:
     //     Output Targets
     // -------------------------------------------------------------------------
 
-    std::shared_ptr<genesis::utils::BaseOutputTarget> get_output_target(
+    std::shared_ptr<genesis::util::io::BaseOutputTarget> get_output_target(
         std::string const& infix, std::string const& extension
     ) const;
 
