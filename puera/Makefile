@@ -50,7 +50,7 @@ build: build/CMakeCache.txt
 update:
 	@echo "Running make with new files..."
 	@touch CMakeLists.txt
-	@touch libs/genesis/CMakeLists.txt
+	@if [ -f libs/genesis/CMakeLists.txt ]; then touch libs/genesis/CMakeLists.txt; fi
 	$(MAKE) -s -C build
 .PHONY: update
 

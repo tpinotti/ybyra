@@ -70,5 +70,4 @@ function update_commit_hash() {
 #    Submodule Dependencies
 ####################################################################################################
 
-update_commit_hash "CLI11"
 update_commit_hash "genesis"

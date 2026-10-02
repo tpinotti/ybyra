@@ -128,44 +128,47 @@ if( NOT ( CMAKE_VERSION VERSION_LESS 3.9 ))
 endif()
 
 # --------------------------------------------------------------------------------------------------
-#   Download Dependencies
+#   Dependencies
 # --------------------------------------------------------------------------------------------------
 
-# Downloads dependencies if they are not there. We use a special script for this.
-include( "${CMAKE_CURRENT_LIST_DIR}/tools/cmake/DownloadDependency.cmake" )
+# Genesis commit to download if the submodule is not checked out (e.g., when downloaded as a zip).
+# Set by tools/cmake/update_dependencies.sh to the checked out submodule commit; do not edit manually.
+SET( genesis_COMMIT_HASH "b4e4f4101791a4f3abde76d64b0afe4424e43a79" ) #genesis_COMMIT_HASH#
 
-# Store the commit hashes of our dependencies.
-# These are replaced by tools/cmake/update_dependencies.sh to the hashes that are currently checked out.
-# Thus, do not replace the hashes manually!
-SET( CLI11_COMMIT_HASH "3a69ed51c0b58a67c0d11b97fbfec69471b27cf5" ) #CLI11_COMMIT_HASH#
-SET( genesis_COMMIT_HASH "bdc1ddfab7d4e2f3b63dfd4dfde658dbf5ecea7c" ) #genesis_COMMIT_HASH#
-
-# Call the github download function, which takes four arguments:
-#  - LIBPATH    : Path to the libracy dir where dependencies are stored.
-#  - LIBNAME    : Name of the dependency, i.e., the name of its main directory within the ${LIBPATH}.
-#  - TESTFILE   : A testfile to check if the dependency is already there.
-#  - REPOSITORY : Github repository (user/reponame)
-#  - COMMITHASH : Hash of the commit to check out
-DOWNLOAD_GITHUB_DEPENDENCY( "${PROJECT_SOURCE_DIR}/libs" "CLI11"    "CMakeLists.txt" "CLIUtils/CLI11"    ${CLI11_COMMIT_HASH} )
-DOWNLOAD_GITHUB_DEPENDENCY( "${PROJECT_SOURCE_DIR}/libs" "genesis"  "CMakeLists.txt" "lczech/genesis"    ${genesis_COMMIT_HASH} )
+# Use the genesis submodule if present, otherwise download the pinned commit from GitHub.
+# We only use FetchContent for the download (the non-existing SOURCE_SUBDIR prevents it from adding
+# the project), and add it ourselves, so that the variables genesis exports reach our scope.
+message (STATUS "Looking for genesis")
+set( GENESIS_SUBMODULE_DIR ${PROJECT_SOURCE_DIR}/libs/genesis )
+if( EXISTS "${GENESIS_SUBMODULE_DIR}/CMakeLists.txt" )
+    message( STATUS "Using genesis submodule" )
+    set( GENESIS_SOURCE_DIR "${GENESIS_SUBMODULE_DIR}" )
+else()
+    message( STATUS "${ColorBlue}Using genesis from GitHub @ ${genesis_COMMIT_HASH}${ColorEnd}" )
+    include( FetchContent )
+    FetchContent_Declare(
+        genesis
+        URL "https://github.com/lczech/genesis/archive/${genesis_COMMIT_HASH}.zip"
+        SOURCE_SUBDIR "no-add-subdirectory"
+    )
+    FetchContent_MakeAvailable( genesis )
+    set( GENESIS_SOURCE_DIR "${genesis_SOURCE_DIR}" )
+endif()
 
 # Policy CMP0042: Enable MACOSX_RPATH
 if (APPLE)
    set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
-# --------------------------------------------------------------------------------------------------
-#   Dependencies Settings
-# --------------------------------------------------------------------------------------------------
-
 # Force to set the options used for genesis. Bit cumbersome in cmake...
-# For now, PUERA is always compiled with C++11, so we deactivate
-# the genesis auto detection of the highest available C++ standard here.
-set(GENESIS_CPP_STANDARD "17" CACHE BOOL "" FORCE)
+# We use C++17, so we deactivate the genesis auto detection of the highest available C++ standard.
+# We do not need OpenMP or htslib, so deactivate them to keep the build simple.
+set(GENESIS_CPP_STANDARD "17" CACHE STRING "" FORCE)
 set(GENESIS_USE_OPENMP OFF CACHE BOOL "" FORCE)
+set(GENESIS_USE_HTSLIB OFF CACHE BOOL "" FORCE)
 
 # Add Genesis as dependency.
-add_subdirectory(${PROJECT_SOURCE_DIR}/libs/genesis)
+add_subdirectory( ${GENESIS_SOURCE_DIR} ${CMAKE_BINARY_DIR}/genesis )
 
 # Use everything that Genesis exports, just to be sure that we use the same setup.
 add_definitions( ${GENESIS_DEFINITIONS} )
@@ -173,9 +176,6 @@ include_directories( ${GENESIS_INCLUDE_DIR} )
 set( CMAKE_C_FLAGS          "${CMAKE_C_FLAGS}          ${GENESIS_C_FLAGS}")
 set( CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS}        ${GENESIS_CXX_FLAGS}" )
 set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GENESIS_EXE_LINKER_FLAGS}" )
-
-# Add CLI11 as dependency. It's header-only, so this is easy.
-include_directories( SYSTEM "libs/CLI11/include" )
 
 # ------------------------------------------------------------------------------
 #   Sources
@@ -189,8 +189,8 @@ file (GLOB_RECURSE puera_sources ${PROJECT_SOURCE_DIR}/src/*.cpp)
 include_directories( "src" )
 add_executable( puera ${puera_sources} )
 
-# Link it against Genesis, and against all dependencies of Genesis.
-target_link_libraries ( puera ${GENESIS_LINK_LIBRARIES} )
+# Link it against Genesis and all its dependencies, and against the CLI11 target provided by genesis.
+target_link_libraries ( puera ${GENESIS_LINK_LIBRARIES} CLI11 )
 
 # We have to use LTO for puera as well for some compilers to properly link, I think.
 if(GENESIS_HAS_LTO)
