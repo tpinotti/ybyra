@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    paths-ignore: &ignore
+      - "**.md"
+      - "gallery/**"
+      - "puera/**"
+  pull_request:
+    paths-ignore: *ignore
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-26.04
+          - macos-14
+          - macos-15
+          - macos-26
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: workflow/envs/ybyra.yaml
+          cache-environment: true
+
+      - name: Run example
+        run: |
+          snakemake --cores 2 --directory example
+          diff example/expected_aggregate.yplace example/aggregate.yplace
+          test -s example/aggregate.pdf
+          test -s example/scoreties.pdf
+
+      - name: Run tests
+        if: success() || failure()
+        run: test/run_tests.sh
+
+      - name: Upload outputs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: outputs-${{ matrix.os }}
+          path: |
+            test/out/
+            example/
+            !example/bams/
+            !example/ref/

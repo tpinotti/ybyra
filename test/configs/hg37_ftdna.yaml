@@ -1,0 +1,6 @@
+# Test run on the example data, using the ftdna tree.
+ref_genome: "ref/hs37d5.Y.fa.gz"
+ref_data: "hg37_ftdna"
+lib_type: "both"
+damage_filter: true
+damage_model: "bi"

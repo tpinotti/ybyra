@@ -1,5 +1,10 @@
 # ybyra: Y-chromosome haplogroup calling using a tree-based scoring method
 
+[![License](https://img.shields.io/github/license/tpinotti/ybyra)](https://github.com/tpinotti/ybyra/blob/main/LICENSE.md)
+[![CI](https://github.com/tpinotti/ybyra/actions/workflows/ci.yaml/badge.svg)](https://github.com/tpinotti/ybyra/actions/workflows/ci.yaml)
+[![Release](https://img.shields.io/github/v/release/tpinotti/ybyra)](https://github.com/tpinotti/ybyra/releases)
+[![DOI](https://img.shields.io/badge/DOI-10.1101%2F2025.11.20.689455-blue)](https://doi.org/10.1101/2025.11.20.689455)
+
 ybyra is a Snakemake workflow which calls Y-chromosome haplogroups from bam files by using a tree-based scoring of derived and ancestral SNP calls.
 
 

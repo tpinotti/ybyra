@@ -1,0 +1,9 @@
+individual	optplacement	tree_score	flag	tree_path
+I11592_CopperAgePortugal	I2a1a2~	240	...	I2a1a2~<I2a1a2<I2a1a<I2a1<I2a<I2<I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I11599_CopperAgePortugal	I2a1a1a~	181	...	I2a1a1a~<I2a1a1a<I2a1a1<I2a1a<I2a1<I2a<I2<I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I11600_CopperAgePortugal	G2a2a1a3	135	...	G2a2a1a3<G2a2a1a<G2a2a1<G2a2a<G2a2<G2a<G2<G<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I11604_CopperAgePortugal	I	20	tree_score_below_50	I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I11605_CopperAgePortugal	I2a1a1a~	219	...	I2a1a1a~<I2a1a1a<I2a1a1<I2a1a<I2a1<I2a<I2<I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I5428_CopperAgePortugal	I2a1a2	144	score_tie;most_recent_common_parent	I2a1a2<I2a1a<I2a1<I2a<I2<I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I5429_CopperAgePortugal	I2a1a1a~	444	unstable_downstream	I2a1a1a~<I2a1a1a<I2a1a1<I2a1a<I2a1<I2a<I2<I<IJ<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
+I7691_BronzeAgePortugal	R1b1a1b1a	25	tree_score_below_50;step_rule	R1b1a1b1a<R1b1a1b1<R1b1a1b<R1b1a1<R1b1a<R1b1<R1b<R1<R<P1<P<K2b<K2<K<IJK<HIJK<GHIJK<F<CF<CT<BT<A1b<A1<A0-T<A00-T<A000-T<ybyra
