@@ -64,6 +64,7 @@ CLI::Option* ColorNormOptions::add_min_value_opt_to_app(
         "Minimum value that is represented by the color scale. "
         "If not set, a default suitable for the plot is used."
     );
+    min_value_option.option->default_function( [](){ return std::string( "auto" ); } );
     min_value_option.option->group( group );
     return min_value_option.option;
 }
@@ -78,6 +79,7 @@ CLI::Option* ColorNormOptions::add_max_value_opt_to_app(
         "Maximum value that is represented by the color scale. "
         "If not set, the maximum value of the data is used."
     );
+    max_value_option.option->default_function( [](){ return std::string( "auto" ); } );
     max_value_option.option->group( group );
     return max_value_option.option;
 }

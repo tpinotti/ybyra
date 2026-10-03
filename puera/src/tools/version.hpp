@@ -32,7 +32,7 @@
 
 inline std::string puera_version()
 {
-    return "v0.0.1"; // #PUERA_VERSION#
+    return "v0.1.0"; // #PUERA_VERSION#
 }
 
 inline std::string puera_header()

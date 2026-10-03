@@ -33,3 +33,7 @@ Version: 13.05.0
 License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en)
 
 Website: [github.com/YFullTeam/YTree](https://github.com/YFullTeam/YTree) and [yfull.com/tree](https://www.yfull.com/tree/)
+
+## Clade labels
+
+The `*.labels.tsv` files in the tree subdirectories label the major haplogroups B-T in plots made with [ybyrapûera](../puera/). They are generated with `make_clade_labels.py`, and can be edited by hand.
