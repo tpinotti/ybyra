@@ -41,7 +41,7 @@
 // =================================================================================================
 
 /**
- * @brief
+ * @brief Options to read the tree from a table listing each node and its parent.
  */
 class TreeTableOptions
 {
@@ -64,9 +64,6 @@ public:
     //     Setup Functions
     // -------------------------------------------------------------------------
 
-    /**
-     * @brief
-     */
     void add_tree_table_opt_to_app(
         CLI::App* sub,
         bool required = true,
@@ -80,12 +77,14 @@ public:
     /**
      * @brief Get the tree as provided by the user input table.
      */
-    genesis::tree::Tree get_tree() const;
+    genesis::tree::Tree const& get_tree() const;
 
     /**
-     * @brief Get a map of node names to edge indices in the given tree.
+     * @brief Get a map from node names to the indices of the edges leading to these nodes.
+     *
+     * The root node is not contained, as it does not have such an edge.
      */
-    std::unordered_map<std::string, size_t> make_node_name_to_edge_index() const;
+    std::unordered_map<std::string, size_t> const& node_name_to_edge_index() const;
 
     /**
      * @brief Update the tree branch lengths to match the SNP count, for vis purposes.
@@ -115,6 +114,7 @@ private:
     CliOption<std::string> separator_char_opt_ = "comma";
 
     mutable genesis::tree::Tree tree_;
+    mutable std::unordered_map<std::string, size_t> node_name_to_edge_index_;
 
 };
 

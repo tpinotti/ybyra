@@ -105,7 +105,7 @@ std::vector<size_t> SnpsTableOptions::get_snps_per_edge_counts(
 ) const {
     // Create a map of branch names to edge indices, for speed
     auto const& tree = tree_opts.get_tree();
-    auto const node_name_to_edge_index = tree_opts.make_node_name_to_edge_index();
+    auto const& node_name_to_edge_index = tree_opts.node_name_to_edge_index();
 
     // First read the table containing the snps and branches
     auto const sep_char = translate_separator_char( separator_char_opt_ );

@@ -26,7 +26,17 @@
 
 #include "CLI/CLI.hpp"
 
+#include "options/color_map.hpp"
+#include "options/color_norm.hpp"
 #include "options/file_output.hpp"
+#include "options/snps_table.hpp"
+#include "options/tree_annotation.hpp"
+#include "options/tree_output_svg.hpp"
+#include "options/tree_table.hpp"
+#include "options/ybyra_input.hpp"
+#include "tools/cli_option.hpp"
+
+#include <string>
 
 // =================================================================================================
 //      Options
@@ -35,6 +45,18 @@
 class SampleOptions
 {
 public:
+
+    // Input options
+    TreeTableOptions  tree_table;
+    SnpsTableOptions  snps_table;
+    YbyraInputOptions ybyra_input;
+
+    // Drawing options
+    SvgTreeOutputOptions  svg_tree;
+    TreeAnnotationOptions annotation;
+    ColorMapOptions       color_map;
+    ColorNormOptions      color_norm;
+    CliOption<std::string> color_range = "per-sample";
 
     // Output options
     FileOutputOptions file_output;

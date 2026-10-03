@@ -103,36 +103,36 @@ void TreeTableOptions::add_tree_table_opt_to_app(
 //      Run Functions
 // =================================================================================================
 
-genesis::tree::Tree TreeTableOptions::get_tree() const
+genesis::tree::Tree const& TreeTableOptions::get_tree() const
 {
     read_tree_();
     return tree_;
 }
 
-std::unordered_map<std::string, size_t> TreeTableOptions::make_node_name_to_edge_index() const
+std::unordered_map<std::string, size_t> const& TreeTableOptions::node_name_to_edge_index() const
 {
-    // Get the tree
     read_tree_();
+    if( ! node_name_to_edge_index_.empty() ) {
+        return node_name_to_edge_index_;
+    }
 
-    // Create a map of branch names to edge indices, for speed
-    std::unordered_map<std::string, size_t> result;
     for( auto const& node : tree_.nodes() ) {
         if( is_root( node )) {
             continue;
         }
         auto const& node_name = node.data<CommonNodeData>().name;
-        if( result.count( node_name ) > 0 ) {
-            throw std::runtime_error( "Duplicate node name: " + node_name );
+        if( node_name_to_edge_index_.count( node_name ) > 0 ) {
+            throw std::runtime_error( "Duplicate node name in tree table: " + node_name );
         }
-        auto const edge_index = node.primary_edge().index();
-        result[ node_name ] = edge_index;
+        node_name_to_edge_index_[ node_name ] = node.primary_edge().index();
     }
-    return result;
+    return node_name_to_edge_index_;
 }
 
 void TreeTableOptions::set_tree_branch_length_to_snp_counts(
     std::vector<size_t> const& edge_snp_counts
 ) const {
+    read_tree_();
     internal_check( edge_snp_counts.size() == tree_.edge_count() );
     for( size_t i = 0; i < edge_snp_counts.size(); ++i ) {
         tree_.edge_at( i ).data<CommonEdgeData>().branch_length = edge_snp_counts[i];

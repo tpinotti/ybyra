@@ -69,18 +69,14 @@ std::string get_option_value( CLI::Option const* option )
 {
     std::string value;
 
-    // Non-flags
-    if( option->get_type_size() != 0 ) {
+    // Non-flags. Flags are options that expect no value.
+    if( option->get_expected_max() != 0 ) {
 
-        // If the option was found on command line
+        // If the option was found on command line, use its values, otherwise the default.
         if( option->count() > 0 ) {
-            value = CLI::detail::ini_join( option->results() );
-            // value = genesus::utils::join( option->results(), " " );
-
-        // Else use the default
+            value = CLI::detail::join( option->results(), " " );
         } else {
             value = option->get_default_str();
-            // + " (default)";
         }
 
     // Flag, one passed

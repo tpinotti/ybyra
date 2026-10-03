@@ -51,6 +51,15 @@ struct CliOption
         return *this;
     }
 
+    /**
+     * @brief Return whether the option was added to the command line interface,
+     * and the user actually provided it.
+     */
+    bool is_set() const
+    {
+        return option && option->count() > 0;
+    }
+
     T            value  = {};
     CLI::Option* option = nullptr;
 };
@@ -76,6 +85,15 @@ struct CliOption<std::string>
     {
         option = opt;
         return *this;
+    }
+
+    /**
+     * @brief Return whether the option was added to the command line interface,
+     * and the user actually provided it.
+     */
+    bool is_set() const
+    {
+        return option && option->count() > 0;
     }
 
 

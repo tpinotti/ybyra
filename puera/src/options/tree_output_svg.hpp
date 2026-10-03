@@ -1,5 +1,5 @@
-#ifndef PUERA_OPTIONS_SNPS_TABLE_H_
-#define PUERA_OPTIONS_SNPS_TABLE_H_
+#ifndef PUERA_OPTIONS_TREE_OUTPUT_SVG_H_
+#define PUERA_OPTIONS_TREE_OUTPUT_SVG_H_
 
 /*
     puera - visualizing y-chromosome samples on trees
@@ -26,49 +26,31 @@
 
 #include "CLI/CLI.hpp"
 
-#include "options/tree_table.hpp"
 #include "tools/cli_option.hpp"
 
+#include "genesis/tree/drawing/function.hpp"
 #include "genesis/tree/tree.hpp"
 
-#include <functional>
 #include <string>
-#include <unordered_map>
-#include <utility>
-#include <vector>
 
 // =================================================================================================
-//      SNPs Table Options
+//      SVG Tree Output Options
 // =================================================================================================
 
 /**
- * @brief Options to read the table of SNPs of the tree, giving the branch that each SNP is on.
+ * @brief Options for the shape, type, and stroke width of SVG tree drawings.
  */
-class SnpsTableOptions
+class SvgTreeOutputOptions
 {
 public:
-
-    // -------------------------------------------------------------------------
-    //     Constructor and Rule of Five
-    // -------------------------------------------------------------------------
-
-    SnpsTableOptions()  = default;
-    virtual ~SnpsTableOptions() = default;
-
-    SnpsTableOptions( SnpsTableOptions const& other ) = default;
-    SnpsTableOptions( SnpsTableOptions&& )            = default;
-
-    SnpsTableOptions& operator= ( SnpsTableOptions const& other ) = default;
-    SnpsTableOptions& operator= ( SnpsTableOptions&& )            = default;
 
     // -------------------------------------------------------------------------
     //     Setup Functions
     // -------------------------------------------------------------------------
 
-    void add_snps_table_opt_to_app(
+    void add_svg_tree_output_opts_to_app(
         CLI::App* sub,
-        bool required = true,
-        std::string const& group = "SNPs Table"
+        std::string const& group = "SVG Tree"
     );
 
     // -------------------------------------------------------------------------
@@ -76,26 +58,24 @@ public:
     // -------------------------------------------------------------------------
 
     /**
-     * @brief Return whether the SNP table was provided by the user.
+     * @brief Get the layout parameters for drawing the @p tree.
+     *
+     * With the `auto` tree type, a phylogram is drawn if @p has_branch_lengths is set,
+     * and a cladogram otherwise.
      */
-    bool provided() const
-    {
-        return snps_table_opt_.is_set();
-    }
-
-    /**
-     * @brief Read the SNP table and return a vector with counts of SNPs for each edge.
-     */
-    std::vector<size_t> get_snps_per_edge_counts(
-        TreeTableOptions const& tree_opts
+    genesis::tree::LayoutParameters layout_parameters(
+        genesis::tree::Tree const& tree,
+        bool has_branch_lengths
     ) const;
 
-    // -------------------------------------------------------------------------
-    //     Internal Members
-    // -------------------------------------------------------------------------
-
-private:
-
+    /**
+     * @brief Get the base size unit of the drawing, to which all other sizes are relative.
+     *
+     * Genesis uses the number of nodes in the tree as the radius of circular trees, and roughly
+     * 2*pi times that as the height of rectangular trees. Line widths, font sizes etc that are
+     * proportional to this unit hence look the same for trees of all sizes and both shapes.
+     */
+    static double size_unit( genesis::tree::Tree const& tree );
 
     // -------------------------------------------------------------------------
     //     Option Members
@@ -103,11 +83,9 @@ private:
 
 private:
 
-    CliOption<std::string> snps_table_opt_ = "";
-
-    CliOption<std::string> idx_col_opt_ = "id";
-    CliOption<std::string> par_col_opt_ = "parent";
-    CliOption<std::string> separator_char_opt_ = "tab";
+    CliOption<std::string> shape_        = "circular";
+    CliOption<std::string> type_         = "auto";
+    CliOption<double>      stroke_width_ = 1.0;
 
 };
 

@@ -1,5 +1,5 @@
-#ifndef PUERA_OPTIONS_SAMPLES_H_
-#define PUERA_OPTIONS_SAMPLES_H_
+#ifndef PUERA_OPTIONS_YBYRA_INPUT_H_
+#define PUERA_OPTIONS_YBYRA_INPUT_H_
 
 /*
     puera - visualizing y-chromosome samples on trees
@@ -30,49 +30,48 @@
 #include "options/tree_table.hpp"
 #include "tools/cli_option.hpp"
 
-#include "genesis/tree/tree.hpp"
-
-#include <functional>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 // =================================================================================================
-//      Tree Table Options
+//      Ybyra Input Options
 // =================================================================================================
 
 /**
- * @brief
+ * @brief Options to read the per-sample results of a ybyra run.
+ *
+ * The sample calls are either given as individual files and directories, or as the ybyra output
+ * directory, in which case the calls and placements are taken from their default locations in it.
  */
-class SamplesOptions
+class YbyraInputOptions
 {
 public:
 
     // -------------------------------------------------------------------------
-    //     Constructor and Rule of Five
+    //     Typedefs
     // -------------------------------------------------------------------------
 
-    SamplesOptions()  = default;
-    virtual ~SamplesOptions() = default;
+    struct SampleFile
+    {
+        std::string name;
+        std::string path;
+    };
 
-    SamplesOptions( SamplesOptions const& other ) = default;
-    SamplesOptions( SamplesOptions&& )            = default;
-
-    SamplesOptions& operator= ( SamplesOptions const& other ) = default;
-    SamplesOptions& operator= ( SamplesOptions&& )            = default;
+    struct Placement
+    {
+        std::string node;
+        double      tree_score;
+        std::string flag;
+    };
 
     // -------------------------------------------------------------------------
     //     Setup Functions
     // -------------------------------------------------------------------------
 
-    /**
-     * @brief
-     */
-    void add_samples_opt_to_app(
+    void add_ybyra_input_opts_to_app(
         CLI::App* sub,
-        bool required = true,
-        std::string const& group = "Samples"
+        std::string const& group = "Input"
     );
 
     // -------------------------------------------------------------------------
@@ -80,19 +79,42 @@ public:
     // -------------------------------------------------------------------------
 
     /**
-     * @brief Get the tree as provided by the user input table.
+     * @brief Get the sample names and paths of their calls files, sorted by name.
+     *
+     * The sample name is the file name without the `.calls` extension,
+     * which is the same as the `individual` name used by ybyra in its placement tables.
      */
-    std::vector<double> make_sample_edge_snp_counts_derived(
-        TreeTableOptions const& tree_opts,
-        size_t smp_idx
-    );
+    std::vector<SampleFile> const& sample_files() const;
+
+    /**
+     * @brief Get the placements of the samples, by sample name.
+     *
+     * Empty if no placements file was provided, or if the ybyra directory does not contain one.
+     */
+    std::unordered_map<std::string, Placement> const& placements() const;
+
+    /**
+     * @brief Read the calls file of a sample, and return the value per edge of the tree.
+     *
+     * Each derived call on an edge adds one, each ancestral call subtracts one.
+     */
+    std::vector<double> read_sample_edge_values(
+        SampleFile const& sample,
+        TreeTableOptions const& tree_opts
+    ) const;
+
+    /**
+     * @brief Hint to give to users when the scores computed here do not match the ones from ybyra.
+     */
+    std::string mismatch_hint() const;
 
     // -------------------------------------------------------------------------
-    //     Internal Members
+    //     Internal Helpers
     // -------------------------------------------------------------------------
 
 private:
 
+    std::string placements_file_path_() const;
 
     // -------------------------------------------------------------------------
     //     Option Members
@@ -100,16 +122,14 @@ private:
 
 private:
 
-    FileInputOptions samples_opt_;
+    FileInputOptions       calls_input_;
+    CliOption<std::string> ybyra_dir_;
+    CliOption<std::string> placements_file_;
+    CliOption<bool>        exclude_damage_ = false;
 
-    CliOption<std::string> idx_col_opt_ = "id";
-    CliOption<std::string> par_col_opt_ = "parent";
-    CliOption<std::string> stt_col_opt_ = "state";
-    CliOption<std::string> dmg_col_opt_ = "damage";
-
-    CliOption<std::string> separator_char_opt_ = "tab";
-
-    CliOption<bool> exclude_damage_ = false;
+    mutable std::vector<SampleFile> sample_files_;
+    mutable std::unordered_map<std::string, Placement> placements_;
+    mutable bool placements_read_ = false;
 
 };
 
