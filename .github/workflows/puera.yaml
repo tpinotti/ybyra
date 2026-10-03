@@ -1,0 +1,108 @@
+name: puera
+
+on:
+  push:
+    paths: &paths
+      - "puera/**"
+      - "!puera/**.md"
+      - ".github/workflows/puera.yaml"
+  pull_request:
+    paths: *paths
+
+jobs:
+  build:
+    name: ${{ matrix.os }} ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+
+      # Exact combinations of OS and compiler, as not all compiler versions are available
+      # everywhere. This needs updating when GitHub retires images or toolchain versions.
+      matrix:
+        include:
+
+          # Ubuntu 22.04
+          - { os: ubuntu-22.04, compiler: gcc-10 }
+          - { os: ubuntu-22.04, compiler: gcc-11 }
+          - { os: ubuntu-22.04, compiler: gcc-12 }
+          - { os: ubuntu-22.04, compiler: gcc-13 }
+          - { os: ubuntu-22.04, compiler: gcc-14 }
+          - { os: ubuntu-22.04, compiler: llvm-13 }
+          - { os: ubuntu-22.04, compiler: llvm-14 }
+          - { os: ubuntu-22.04, compiler: llvm-15 }
+          - { os: ubuntu-22.04, compiler: llvm-16 }
+          - { os: ubuntu-22.04, compiler: llvm-17 }
+          - { os: ubuntu-22.04, compiler: llvm-18 }
+          - { os: ubuntu-22.04, compiler: llvm-19 }
+          - { os: ubuntu-22.04, compiler: llvm-20 }
+
+          # Ubuntu 24.04
+          - { os: ubuntu-24.04, compiler: gcc-10 }
+          - { os: ubuntu-24.04, compiler: gcc-11 }
+          - { os: ubuntu-24.04, compiler: gcc-12 }
+          - { os: ubuntu-24.04, compiler: gcc-13 }
+          - { os: ubuntu-24.04, compiler: gcc-14 }
+          - { os: ubuntu-24.04, compiler: llvm-17 }
+          - { os: ubuntu-24.04, compiler: llvm-18 }
+          - { os: ubuntu-24.04, compiler: llvm-19 }
+          - { os: ubuntu-24.04, compiler: llvm-20 }
+
+          # Ubuntu 26.04
+          - { os: ubuntu-26.04, compiler: gcc-11 }
+          - { os: ubuntu-26.04, compiler: gcc-12 }
+          - { os: ubuntu-26.04, compiler: gcc-13 }
+          - { os: ubuntu-26.04, compiler: gcc-14 }
+          - { os: ubuntu-26.04, compiler: gcc-15 }
+          - { os: ubuntu-26.04, compiler: llvm-17 }
+          - { os: ubuntu-26.04, compiler: llvm-18 }
+          - { os: ubuntu-26.04, compiler: llvm-19 }
+          - { os: ubuntu-26.04, compiler: llvm-20 }
+
+          # macOS 15
+          - { os: macos-15, compiler: llvm-14 }
+          - { os: macos-15, compiler: llvm-15 }
+          - { os: macos-15, compiler: llvm-16 }
+          - { os: macos-15, compiler: llvm-17 }
+          - { os: macos-15, compiler: llvm-18 }
+          - { os: macos-15, compiler: llvm-19 }
+          - { os: macos-15, compiler: llvm-20 }
+          - { os: macos-15, compiler: apple-clang }
+
+          # macOS 26
+          - { os: macos-26, compiler: llvm-16 }
+          - { os: macos-26, compiler: llvm-17 }
+          - { os: macos-26, compiler: llvm-18 }
+          - { os: macos-26, compiler: llvm-19 }
+          - { os: macos-26, compiler: llvm-20 }
+          - { os: macos-26, compiler: apple-clang }
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup C++
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          cmake: true
+          ninja: true
+
+      # Without the submodule checked out, this downloads the pinned genesis commit.
+      - name: Build
+        run: |
+          cmake -G Ninja -S puera -B puera/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build puera/build -j 4
+
+      - name: Run
+        run: |
+          puera/bin/puera --version
+          puera/bin/puera sample --help > /dev/null
+          puera/bin/puera summary \
+            --tree-table-file trees/ftdna/ftdnaY.oct25.complete.tree \
+            --placements-file example/expected_aggregate.yplace \
+            --clade-labels-file trees/ftdna/ftdnaY.oct25.labels.tsv \
+            --out-dir puera/test-out
+          test -s puera/test-out/summary.svg

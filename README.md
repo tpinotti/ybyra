@@ -151,6 +151,8 @@ ybyra generates two plots:
 
 Example plots from ancient individuals from [Antonio et al. 2019](https://doi.org/10.1126/science.aay6826) are in the `gallery/` folder.
 
+For publication-ready SVG trees of each sample and a summary of all samples, see our plotting tool [ybyrapûera](puera/).
+
 
 ## Main Output Files
 
@@ -282,6 +284,8 @@ Ideas, suggestions and comments are very welcome. You can get in touch at thomaz
 ## Attribution
 
 ybyra is published under the [MIT License](https://github.com/tpinotti/ybyra/blob/dev/LICENSE.md).
+
+ybyrapûera, in the [`puera`](puera/) subdirectory, is published under the [GPLv3](puera/LICENSE.txt).
 
 International Society of Genetic Genealogy (ISOGG) tree is distributed under the [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en) license.
 
