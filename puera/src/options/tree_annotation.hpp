@@ -29,6 +29,7 @@
 #include "options/tree_table.hpp"
 #include "tools/cli_option.hpp"
 
+#include "genesis/util/color/color.hpp"
 #include "genesis/util/format/svg/document.hpp"
 #include "genesis/util/format/svg/group.hpp"
 
@@ -40,7 +41,7 @@
 // =================================================================================================
 
 /**
- * @brief Options for the annotations drawn on top of a tree: clade labels, the placement marker,
+ * @brief Options for the annotations drawn on top of a tree: clade labels, the placement markers,
  * and the title.
  *
  * All sizes are multipliers of automatic sizes that are relative to the size unit of the drawing,
@@ -92,6 +93,15 @@ public:
     ) const;
 
     /**
+     * @brief Get a filled circle to be drawn at a node with placed samples. Its area is
+     * proportional to @p fraction, which is the count at the node relative to the maximum count.
+     */
+    genesis::util::format::SvgGroup make_count_circle(
+        double size_unit,
+        double fraction
+    ) const;
+
+    /**
      * @brief Add a title line above the drawing, unless the title is deactivated.
      */
     void add_title(
@@ -99,6 +109,14 @@ public:
         std::string const& title,
         double size_unit
     ) const;
+
+    // -------------------------------------------------------------------------
+    //     Internal Helpers
+    // -------------------------------------------------------------------------
+
+private:
+
+    genesis::util::color::Color marker_color_() const;
 
     // -------------------------------------------------------------------------
     //     Option Members
@@ -111,7 +129,7 @@ private:
 
     CliOption<double>      marker_size_         = 1.0;
     CliOption<double>      marker_stroke_width_ = 1.0;
-    CliOption<std::string> marker_color_        = "#FF6600";
+    CliOption<std::string> marker_color_opt_    = "#FF6600";
 
     CliOption<bool>        no_title_ = false;
 

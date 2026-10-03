@@ -66,8 +66,14 @@ public:
     //     Setup Functions
     // -------------------------------------------------------------------------
 
-    CLI::Option* add_log_scaling_opt_to_app(
+    /**
+     * @brief Add the option to choose linear or logarithmic scaling. If @p auto_description is
+     * given, `auto` is also offered as the default, letting the command choose the scaling,
+     * as explained by the description.
+     */
+    CLI::Option* add_scaling_opt_to_app(
         CLI::App* sub,
+        std::string const& auto_description = "",
         std::string const& group = "Color"
     );
 
@@ -90,9 +96,12 @@ public:
     //     Run Functions
     // -------------------------------------------------------------------------
 
-    bool log_scaling() const
+    /**
+     * @brief Return whether to use logarithmic scaling, with @p auto_log used for `auto`.
+     */
+    bool log_scaling( bool auto_log = false ) const
     {
-        return log_scaling_option.value;
+        return scaling_option.value == "log" || ( scaling_option.value == "auto" && auto_log );
     }
 
     bool min_value_is_set() const
@@ -109,7 +118,9 @@ public:
      * @brief Get a linear or logarithmic normalization, depending on the log scaling option,
      * with the user provided values already applied.
      */
-    std::unique_ptr<genesis::util::color::ColorNormalizationLinear> get_sequential_norm() const;
+    std::unique_ptr<genesis::util::color::ColorNormalizationLinear> get_sequential_norm(
+        bool auto_log = false
+    ) const;
 
     /**
      * @brief Overwrite the min, max, and mask values of the @p norm with the values
@@ -123,10 +134,10 @@ public:
 
 private:
 
-    CliOption<bool>   log_scaling_option = false;
-    CliOption<double> min_value_option   = 0.0;
-    CliOption<double> max_value_option   = 1.0;
-    CliOption<double> mask_value_option  = std::numeric_limits<double>::quiet_NaN();
+    CliOption<std::string> scaling_option = "linear";
+    CliOption<double>      min_value_option  = 0.0;
+    CliOption<double>      max_value_option  = 1.0;
+    CliOption<double>      mask_value_option = std::numeric_limits<double>::quiet_NaN();
 
 };
 

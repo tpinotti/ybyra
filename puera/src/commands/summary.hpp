@@ -26,7 +26,18 @@
 
 #include "CLI/CLI.hpp"
 
+#include "options/color_map.hpp"
+#include "options/color_norm.hpp"
 #include "options/file_output.hpp"
+#include "options/snps_table.hpp"
+#include "options/tree_annotation.hpp"
+#include "options/tree_output_svg.hpp"
+#include "options/tree_table.hpp"
+#include "options/ybyra_input.hpp"
+#include "tools/cli_option.hpp"
+
+#include <string>
+#include <vector>
 
 // =================================================================================================
 //      Options
@@ -36,7 +47,27 @@ class SummaryOptions
 {
 public:
 
+    // Input options
+    TreeTableOptions  tree_table;
+    SnpsTableOptions  snps_table;
+    YbyraInputOptions ybyra_input;
+    CliOption<std::string>              groups_file;
+    CliOption<std::vector<std::string>> exclude_flags;
+
+    // Counting options
+    CliOption<std::string> count_mode = "cumulative";
+
+    // Drawing options
+    SvgTreeOutputOptions  svg_tree;
+    TreeAnnotationOptions annotation;
+    CliOption<bool>       count_circles = false;
+    ColorMapOptions       color_map;
+    ColorNormOptions      color_norm;
+    CliOption<std::string> color_range = "all-groups";
+
     // Output options
+    CliOption<bool>        write_table  = false;
+    CliOption<std::string> table_format = "wide";
     FileOutputOptions file_output;
 
 };

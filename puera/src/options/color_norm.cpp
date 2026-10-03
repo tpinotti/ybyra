@@ -27,17 +27,31 @@
 //      Setup Functions
 // =================================================================================================
 
-CLI::Option* ColorNormOptions::add_log_scaling_opt_to_app(
+CLI::Option* ColorNormOptions::add_scaling_opt_to_app(
     CLI::App* sub,
+    std::string const& auto_description,
     std::string const& group
 ) {
-    log_scaling_option = sub->add_flag(
-        "--log-scaling",
-        log_scaling_option.value,
-        "If set, the color scale is logarithmic instead of linear."
+    bool const with_auto = ! auto_description.empty();
+    if( with_auto ) {
+        scaling_option.value = "auto";
+    }
+    scaling_option = sub->add_option(
+        "--color-scaling",
+        scaling_option.value,
+        "Scaling of the color scale, `linear` or logarithmic (`log`). " + auto_description
     );
-    log_scaling_option.option->group( group );
-    return log_scaling_option.option;
+    scaling_option.option->group( group );
+    if( with_auto ) {
+        scaling_option.option->transform(
+            CLI::IsMember({ "auto", "linear", "log" }, CLI::ignore_case )
+        );
+    } else {
+        scaling_option.option->transform(
+            CLI::IsMember({ "linear", "log" }, CLI::ignore_case )
+        );
+    }
+    return scaling_option.option;
 }
 
 CLI::Option* ColorNormOptions::add_min_value_opt_to_app(
@@ -88,12 +102,12 @@ CLI::Option* ColorNormOptions::add_mask_value_opt_to_app(
 // =================================================================================================
 
 std::unique_ptr<genesis::util::color::ColorNormalizationLinear>
-ColorNormOptions::get_sequential_norm() const
+ColorNormOptions::get_sequential_norm( bool auto_log ) const
 {
     using namespace genesis::util::color;
 
     std::unique_ptr<ColorNormalizationLinear> result;
-    if( log_scaling_option.value ) {
+    if( log_scaling( auto_log )) {
         result = std::make_unique<ColorNormalizationLogarithmic>();
     } else {
         result = std::make_unique<ColorNormalizationLinear>();

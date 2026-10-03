@@ -33,6 +33,7 @@
 #include "genesis/util/io/input_source.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <unordered_set>
 
@@ -43,6 +44,9 @@ using namespace genesis::util::format;
 static double const label_font_factor_    = 0.037;
 static double const marker_radius_factor_ = 0.03;
 static double const marker_stroke_factor_ = 0.01;
+static double const circle_radius_factor_ = 0.025;
+static double const circle_stroke_factor_ = 0.003;
+static double const circle_opacity_       = 0.7;
 
 // =================================================================================================
 //      Setup Functions
@@ -79,7 +83,7 @@ void TreeAnnotationOptions::add_marker_opts_to_app(
     marker_size_.option = sub->add_option(
         "--marker-size",
         marker_size_.value,
-        "Radius of the ring that marks the placement of a sample, "
+        "Size of the markers that show sample placements, "
         "as a multiplier of the automatic size, which is scaled to the size of the tree."
     );
     marker_size_.option->check( CLI::PositiveNumber );
@@ -88,19 +92,19 @@ void TreeAnnotationOptions::add_marker_opts_to_app(
     marker_stroke_width_.option = sub->add_option(
         "--marker-stroke-width",
         marker_stroke_width_.value,
-        "Stroke width of the ring that marks the placement of a sample, "
+        "Stroke width of the markers that show sample placements, "
         "as a multiplier of the automatic width, which is scaled to the size of the tree."
     );
     marker_stroke_width_.option->check( CLI::PositiveNumber );
     marker_stroke_width_.option->group( group );
 
-    marker_color_.option = sub->add_option(
+    marker_color_opt_.option = sub->add_option(
         "--marker-color",
-        marker_color_.value,
-        "Color of the ring that marks the placement of a sample. "
+        marker_color_opt_.value,
+        "Color of the markers that show sample placements. "
         "Color can be specified in the format `#rrggbb` using hex values, or by web color names."
     );
-    marker_color_.option->group( group );
+    marker_color_opt_.option->group( group );
 }
 
 void TreeAnnotationOptions::add_title_opt_to_app(
@@ -189,16 +193,7 @@ SvgGroup TreeAnnotationOptions::make_placement_marker(
     double size_unit,
     bool dashed
 ) const {
-    Color color;
-    try {
-        color = resolve_color_string( marker_color_.value );
-    } catch( std::exception const& ex ) {
-        throw CLI::ValidationError(
-            "--marker-color", "Invalid color '" + marker_color_.value + "': " + ex.what()
-        );
-    }
-
-    auto stroke = SvgStroke( color, marker_stroke_width_.value * marker_stroke_factor_ * size_unit );
+    auto stroke = SvgStroke( marker_color_(), marker_stroke_width_.value * marker_stroke_factor_ * size_unit );
     if( dashed ) {
         stroke.dash_array = { 1.5 * stroke.width, 1.0 * stroke.width };
     }
@@ -207,6 +202,24 @@ SvgGroup TreeAnnotationOptions::make_placement_marker(
     result.add( SvgCircle(
         SvgPoint( 0, 0 ), marker_size_.value * marker_radius_factor_ * size_unit,
         stroke, SvgFill( SvgFill::Type::kNone )
+    ));
+    return result;
+}
+
+SvgGroup TreeAnnotationOptions::make_count_circle(
+    double size_unit,
+    double fraction
+) const {
+    auto color = marker_color_();
+    color.a( circle_opacity_ );
+
+    // White outline, so that overlapping circles stay distinguishable.
+    auto const radius = marker_size_.value * circle_radius_factor_ * size_unit * std::sqrt( fraction );
+    SvgGroup result;
+    result.add( SvgCircle(
+        SvgPoint( 0, 0 ), radius,
+        SvgStroke( Color( 1.0, 1.0, 1.0 ), marker_stroke_width_.value * circle_stroke_factor_ * size_unit ),
+        SvgFill( color )
     ));
     return result;
 }
@@ -226,4 +239,19 @@ void TreeAnnotationOptions::add_title(
     auto text = SvgText( title, SvgPoint( bbox.top_left.x, bbox.top_left.y - font_size ));
     text.font.size = font_size;
     doc.add( text );
+}
+
+// =================================================================================================
+//      Internal Helpers
+// =================================================================================================
+
+Color TreeAnnotationOptions::marker_color_() const
+{
+    try {
+        return resolve_color_string( marker_color_opt_.value );
+    } catch( std::exception const& ex ) {
+        throw CLI::ValidationError(
+            "--marker-color", "Invalid color '" + marker_color_opt_.value + "': " + ex.what()
+        );
+    }
 }

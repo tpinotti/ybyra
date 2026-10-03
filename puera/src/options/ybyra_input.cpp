@@ -66,38 +66,55 @@ static Dataframe read_table_( std::string const& path, std::vector<std::string> 
 
 void YbyraInputOptions::add_ybyra_input_opts_to_app(
     CLI::App* sub,
+    bool with_calls,
     std::string const& group
 ) {
+    with_calls_ = with_calls;
+
     // Calls files
-    auto calls_opt = calls_input_.add_multi_file_input_opt_to_app(
-        sub, "calls", "ybyra calls", "calls", "calls", false, group,
-        "These are the per-sample `calls/<sample>.calls` files of a ybyra run."
-    );
+    CLI::Option* calls_opt = nullptr;
+    if( with_calls ) {
+        calls_opt = calls_input_.add_multi_file_input_opt_to_app(
+            sub, "calls", "ybyra calls", "calls", "calls", false, group,
+            "These are the per-sample `calls/<sample>.calls` files of a ybyra run."
+        );
+    }
 
     // Ybyra dir
     ybyra_dir_.option = sub->add_option(
         "--ybyra-dir",
         ybyra_dir_.value,
-        "Output directory of a ybyra run. All sample calls files in its `calls/` directory are "
-        "used, as well as the placements in `aggregate.yplace`, if present. "
-        "This is an alternative to providing the files individually."
+        with_calls
+        ? "Output directory of a ybyra run. All sample calls files in its `calls/` directory are "
+          "used, as well as the placements in `aggregate.yplace`, if present. "
+          "This is an alternative to providing the files individually."
+        : "Output directory of a ybyra run. The placements are read from its `aggregate.yplace`, "
+          "and the samples that could not be placed from its `fail.yplace`, if present. "
+          "This is an alternative to providing the placements file."
     );
     ybyra_dir_.option->check( CLI::ExistingDirectory );
     ybyra_dir_.option->group( group );
-    ybyra_dir_.option->excludes( calls_opt );
+    if( calls_opt ) {
+        ybyra_dir_.option->excludes( calls_opt );
+    }
 
     // Placements file
     placements_file_.option = sub->add_option(
         "--placements-file",
         placements_file_.value,
-        "The `aggregate.yplace` file of a ybyra run, containing the placement of each sample. "
-        "If provided, the placement of each sample is marked in the plot."
+        with_calls
+        ? "The `aggregate.yplace` file of a ybyra run, containing the placement of each sample. "
+          "If provided, the placement of each sample is marked in the plot."
+        : "The `aggregate.yplace` file of a ybyra run, containing the placement of each sample."
     );
     placements_file_.option->check( CLI::ExistingFile );
     placements_file_.option->group( group );
     placements_file_.option->excludes( ybyra_dir_.option );
 
     // Damage
+    if( ! with_calls ) {
+        return;
+    }
     exclude_damage_.option = sub->add_flag(
         "--exclude-damage",
         exclude_damage_.value,
@@ -196,6 +213,20 @@ YbyraInputOptions::placements() const
     return placements_;
 }
 
+std::vector<std::string> YbyraInputOptions::failed_samples() const
+{
+    if( ! ybyra_dir_.is_set() ) {
+        return {};
+    }
+    auto const path = dir_normalize_path( ybyra_dir_.value ) + "fail.yplace";
+    if( ! file_exists( path )) {
+        return {};
+    }
+    auto const table = read_table_( path, { "individual" });
+    auto const& column = table[ "individual" ].as<std::string>();
+    return std::vector<std::string>( column.begin(), column.end() );
+}
+
 std::vector<double> YbyraInputOptions::read_sample_edge_values(
     SampleFile const& sample,
     TreeTableOptions const& tree_opts
@@ -278,8 +309,18 @@ std::string YbyraInputOptions::placements_file_path_() const
         if( file_exists( path )) {
             return path;
         }
+        if( ! with_calls_ ) {
+            throw CLI::ValidationError(
+                "--ybyra-dir", "Directory does not contain an `aggregate.yplace` file: " +
+                ybyra_dir_.value
+            );
+        }
         LOG_WARN << "No aggregate.yplace found in " << ybyra_dir_.value
                  << ", so no placements are shown.";
+    } else if( ! with_calls_ ) {
+        throw CLI::ValidationError(
+            "Input", "Either `--placements-file` or `--ybyra-dir` has to be provided."
+        );
     }
     return "";
 }

@@ -43,6 +43,7 @@
  *
  * The sample calls are either given as individual files and directories, or as the ybyra output
  * directory, in which case the calls and placements are taken from their default locations in it.
+ * Commands that only need the placements can leave out the calls options.
  */
 class YbyraInputOptions
 {
@@ -69,8 +70,13 @@ public:
     //     Setup Functions
     // -------------------------------------------------------------------------
 
+    /**
+     * @brief Add the input options. Without @p with_calls, only the placements are used,
+     * which then are required.
+     */
     void add_ybyra_input_opts_to_app(
         CLI::App* sub,
+        bool with_calls = true,
         std::string const& group = "Input"
     );
 
@@ -92,6 +98,12 @@ public:
      * Empty if no placements file was provided, or if the ybyra directory does not contain one.
      */
     std::unordered_map<std::string, Placement> const& placements() const;
+
+    /**
+     * @brief Get the names of the samples that ybyra could not place, from the `fail.yplace`
+     * file in the ybyra directory. Empty if not available.
+     */
+    std::vector<std::string> failed_samples() const;
 
     /**
      * @brief Read the calls file of a sample, and return the value per edge of the tree.
@@ -126,6 +138,7 @@ private:
     CliOption<std::string> ybyra_dir_;
     CliOption<std::string> placements_file_;
     CliOption<bool>        exclude_damage_ = false;
+    bool                   with_calls_      = true;
 
     mutable std::vector<SampleFile> sample_files_;
     mutable std::unordered_map<std::string, Placement> placements_;

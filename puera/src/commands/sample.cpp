@@ -25,9 +25,9 @@
 
 #include "options/global.hpp"
 #include "tools/cli_setup.hpp"
+#include "tools/tree_drawing.hpp"
 
 #include "genesis/tree/common_tree/tree.hpp"
-#include "genesis/tree/drawing/function.hpp"
 // accumulate.hpp needs is_root() from function.hpp, but does not include it itself.
 #include "genesis/tree/function/function.hpp"
 #include "genesis/tree/function/accumulate.hpp"
@@ -153,7 +153,6 @@ static void check_placements_without_calls( SampleOptions const& options )
 
 void run_sample( SampleOptions const& options )
 {
-    using namespace genesis::tree;
     using namespace genesis::util::format;
 
     // Get the samples and their placements, and check that we can write the output files.
@@ -166,21 +165,11 @@ void run_sample( SampleOptions const& options )
     options.file_output.check_output_files_nonexistence( infixes, "svg" );
     check_placements_without_calls( options );
 
-    // Get the tree, with the number of SNPs per branch as branch lengths, if available.
-    if( options.snps_table.provided() ) {
-        options.tree_table.set_tree_branch_length_to_snp_counts(
-            options.snps_table.get_snps_per_edge_counts( options.tree_table )
-        );
-    }
-    auto const& tree = options.tree_table.get_tree();
-    auto const& node_name_to_edge_index = options.tree_table.node_name_to_edge_index();
-
     // Prepare everything that is the same for all samples.
-    auto const layout_params = options.svg_tree.layout_parameters( tree, options.snps_table.provided() );
-    auto const size_unit = SvgTreeOutputOptions::size_unit( tree );
-    auto const label_shapes = options.annotation.make_clade_label_edge_shapes(
-        options.tree_table, size_unit
+    auto const setup = prepare_tree_drawing(
+        options.tree_table, options.snps_table, options.svg_tree, options.annotation
     );
+    auto const& tree = setup.tree;
     auto const& color_map = options.color_map.color_map();
 
     // If requested, get the highest score across all samples, for the maximum of the color scale.
@@ -211,17 +200,12 @@ void run_sample( SampleOptions const& options )
         auto const placement_it = placements.find( sample.name );
         if( placement_it != placements.end() ) {
             auto const& placement = placement_it->second;
-            auto const edge_it = node_name_to_edge_index.find( placement.node );
-            if( edge_it == node_name_to_edge_index.end() ) {
-                throw std::runtime_error(
-                    "Placement node \"" + placement.node + "\" of sample " + sample.name +
-                    " is not in the tree. "
-                    "Is the tree table the same as the one used in the ybyra run?"
-                );
-            }
+            auto const edge_index = placement_edge_index(
+                options.tree_table, placement.node, sample.name
+            );
 
             // Check that our score at the placement node is the one that ybyra computed.
-            auto const score = scores[ edge_it->second ];
+            auto const score = scores[ edge_index ];
             if( score != placement.tree_score ) {
                 LOG_WARN << "Warning: The tree score of sample " << sample.name
                          << " at its placement " << placement.node << " is " << format_score( score )
@@ -232,8 +216,8 @@ void run_sample( SampleOptions const& options )
             // Ties are resolved by ybyra by placing the sample at the most recent common ancestor
             // of the tied nodes, which we indicate with a dashed ring.
             bool const dashed = placement.flag.find( "most_recent_common_parent" ) != std::string::npos;
-            auto const node_index = tree.edge_at( edge_it->second ).secondary_node().index();
-            node_shapes[ node_index ] = options.annotation.make_placement_marker( size_unit, dashed );
+            auto const node_index = tree.edge_at( edge_index ).secondary_node().index();
+            node_shapes[ node_index ] = options.annotation.make_placement_marker( setup.size_unit, dashed );
 
             title += " · " + placement.node + " · score " + format_score( placement.tree_score );
             if( ! placement.flag.empty() ) {
@@ -258,11 +242,9 @@ void run_sample( SampleOptions const& options )
         }
 
         // Draw the tree and write it.
-        auto doc = get_color_tree_svg_document(
-            tree, layout_params, color_map( *norm, scores ), color_map, *norm,
-            node_shapes, label_shapes
+        write_tree_svg(
+            setup, scores, color_map, *norm, node_shapes,
+            options.annotation, title, options.file_output, "sample-" + sample.name
         );
-        options.annotation.add_title( doc, title, size_unit );
-        doc.write( options.file_output.get_output_target( "sample-" + sample.name, "svg" ));
     }
 }
