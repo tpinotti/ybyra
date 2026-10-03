@@ -3,7 +3,7 @@
 
 /*
     puera - visualizing y-chromosome samples on trees
-    Copyright (C) 2025 Lucas Czech
+    Copyright (C) 2025-2026 Lucas Czech
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ inline std::string puera_version()
 
 inline std::string puera_header()
 {
-    return "puera " + puera_version() + " (c) 2025 by Lucas Czech\n";
+    return "puera " + puera_version() + " (c) 2025-2026 by Lucas Czech\n";
 }
 
 inline std::string puera_title()
