@@ -156,7 +156,8 @@ rule Ytree:
     params:
        sm="{sample}",
        lib = lambda wildcards: config.get("lib_type", "both"),
-       dmg = lambda wildcards: config.get("damage_model", "none")
+       dmg = lambda wildcards: config.get("damage_model", "none"),
+       min_majority_fraction = config["min_majority_fraction"]
     conda:
         "envs/ybyra.yaml"
     shell:
@@ -164,6 +165,7 @@ rule Ytree:
         python {workflow.basedir}/scripts/ytree.py \
             --lib {params.lib} \
             --dmg {params.dmg} \
+            --min-majority-fraction {params.min_majority_fraction} \
             --alleles {input} \
             --out calls/{params.sm} \
             --snpinfo {REF_INFO}

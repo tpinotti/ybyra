@@ -57,6 +57,10 @@ prefix: "ybyra"
 # Mapping quality filter applied to the bam files.
 MQ: 30
 
+# Minimum fraction of reads that need to support the ref or alt allele
+# for a call to be used. Set to 0 to disable this filter.
+min_majority_fraction: 0.7
+
 # Step size for our "step rule" heuristic (default: 5). This has been tested
 # on the human reference tree, but might need to be adjusted
 # for larger trees with more dense sampling of reference individuals.

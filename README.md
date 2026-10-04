@@ -103,7 +103,7 @@ That is, we run ybyra while in the directory with the code, and then use the `--
 
 ## Genotype Calling and Ancient DNA Damage
 
-Genotypes are called using `bcftools`, requiring 70% majority to call a variant at any given locus.
+Genotypes are called using `bcftools`, requiring at least `min_majority_fraction` (default: 70%) of the reads to support either the reference or the alternative allele at any given locus.
 
 SNPs potentially affected by ancient DNA damage are flagged, following library type and damage model:
 

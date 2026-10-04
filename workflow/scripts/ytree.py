@@ -2,13 +2,15 @@ import pandas as pd
 import argparse
 
 #
-#	Majority filter (>70% non-clonal reads)
+#	Majority filter: ref or alt reads (from DP4) need to reach the min fraction
 #
 
-def depth_filter(row):
+def depth_filter(row, min_majority_fraction):
     x, y, w, z = map(int, row['dp4'].split(','))
     total = x + y + w + z
-    return (x + y) / total > 0.7 or (w + z) / total > 0.7
+    if total == 0:
+        return False
+    return (x + y) / total >= min_majority_fraction or (w + z) / total >= min_majority_fraction
 
 #
 #	Damage filter
@@ -65,19 +67,19 @@ def assess_damage(row, lib_type, dmg_model):
 #	Fiat lux
 #
 
-def main(lib_type, out_prefix, alleles_file, snpinfo_file, dmg_model):
+def main(lib_type, out_prefix, alleles_file, snpinfo_file, dmg_model, min_majority_fraction):
 
     snpinfo = pd.read_csv(snpinfo_file, sep='\t')
     alleles = pd.read_csv(alleles_file, sep='\t', names=['position', 'ref', 'alt', 'coverage', 'qual', 'dp4', 'geno'])
 
     derived_calls = pd.merge(alleles, snpinfo, left_on=['position', 'geno'], right_on=['position', 'der'])[['position', 'snpId', 'mutation', 'id', 'parent', 'coverage', 'dp4']]
     derived_calls['state'] = 'derived'
-    flt_derived_calls = derived_calls[derived_calls.apply(depth_filter, axis=1)]
+    flt_derived_calls = derived_calls[derived_calls.apply(depth_filter, axis=1, min_majority_fraction=min_majority_fraction)]
     nopass_derived_calls = derived_calls[~derived_calls.index.isin(flt_derived_calls.index)]
 
     ancestral_calls = pd.merge(alleles, snpinfo, left_on=['position', 'geno'], right_on=['position', 'anc'])[['position', 'snpId', 'mutation', 'id', 'parent', 'coverage', 'dp4']]
     ancestral_calls['state'] = 'ancestral'
-    flt_ancestral_calls = ancestral_calls[ancestral_calls.apply(depth_filter, axis=1)]
+    flt_ancestral_calls = ancestral_calls[ancestral_calls.apply(depth_filter, axis=1, min_majority_fraction=min_majority_fraction)]
     nopass_ancestral_calls = ancestral_calls[~ancestral_calls.index.isin(flt_ancestral_calls.index)]
 
     mergecolumns = ['position', 'snpId', 'mutation', 'id', 'parent', 'coverage', 'dp4', 'state']
@@ -102,6 +104,9 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True, help="Output file prefix")
     parser.add_argument('--alleles', required=True, help="Path to the alleles file")
     parser.add_argument('--snpinfo', required=True, help="Path to the SNP info file")
+    parser.add_argument('--min-majority-fraction', type=float, default=0.7, help="Minimum fraction of reads supporting the ref or alt allele; 0 disables the filter (default: 0.7)")
     args = parser.parse_args()
+    if not 0 <= args.min_majority_fraction <= 1:
+        parser.error("--min-majority-fraction must be between 0 and 1")
 
-    main(args.lib, args.out, args.alleles, args.snpinfo, args.dmg)
+    main(args.lib, args.out, args.alleles, args.snpinfo, args.dmg, args.min_majority_fraction)
