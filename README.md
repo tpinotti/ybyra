@@ -136,10 +136,10 @@ In the case of the optimal placement including ancestral calls, the sample is fl
 
 ### Score Ties
 
-When multiple nodes have the same top tree score  (often in low-coverage or low-resolution areas) and all pass the step rule:
+When multiple nodes have the same top tree score (often in low-coverage or low-resolution areas):
 
 - The sample is flagged as `score_tie`
-- ybyra selects the Most Recent Common Ancestor (MRCA) of all tied nodes with a derived hit as optimal placement
+- ybyra selects the Most Recent Common Ancestor (MRCA) of all tied nodes with a derived hit as optimal placement, which then has to pass the step rule like any other placement. If the tree score of the MRCA is below `min_tree_score`, the sample fails.
 
 ### Exploring the Step Size
 
@@ -252,6 +252,7 @@ List all individuals with `tree_score` below `min_tree_score` (default: 10), wit
 
 - `below_min_tree_score`: No node reaches the minimum tree score
 - `below_min_tree_score_after_step_rule`: All nodes above the minimum tree score failed the step rule
+- `below_min_tree_score_after_score_tie`: The MRCA of the tied top-scoring nodes is below the minimum tree score
 
 ## Per Sample Output Files
 

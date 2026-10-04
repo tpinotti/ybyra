@@ -136,7 +136,11 @@ def summarize_sample(file, step_size=5, min_tree_score=10, low_tree_score=50):
             result["step_rule_nopass"].append((node, score, path))
 
     if not passed:
-        result["fail_flag"] = "below_min_tree_score_after_step_rule"
+        if result["step_rule_nopass"]:
+            result["fail_flag"] = "below_min_tree_score_after_step_rule"
+        else:
+            # The MRCA of the score ties is below the min tree score, so no node was tested.
+            result["fail_flag"] = "below_min_tree_score_after_score_tie"
         return result
 
     if step_rule_applied:

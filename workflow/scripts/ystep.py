@@ -35,6 +35,7 @@ CLASSES = {
 FAIL_CLASSES = {
     "below_min_tree_score": "failed (low score)",
     "below_min_tree_score_after_step_rule": "failed (step rule)",
+    "below_min_tree_score_after_score_tie": "failed (low score)",
 }
 DEPTH_BINS = [0, 0.1, 0.5, 1, 5, float("inf")]
 DEPTH_LABELS = ["< 0.1x", "0.1-0.5x", "0.5-1x", "1-5x", "> 5x"]
