@@ -196,7 +196,7 @@ rule aggregate_yplace:
     shell:
         """
         python {workflow.basedir}/scripts/ysummary.py \
-            {input} --step-size {params.step_size} > {output}
+            {input} --step-size {params.step_size}
         """
 
 rule plot_aggregate:

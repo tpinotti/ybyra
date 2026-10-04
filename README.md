@@ -129,14 +129,14 @@ For each node in the tree where a sample has a derived or ancestral SNPs, ybyra 
 - +1 for every derived SNP from the root to the node
 - –1 for every ancestral SNP along the same path
 
-Instead of just returning the node with the highest score, ybyra selects the *optimal placement* — the highest-scoring node which is supported by at least another derived hit 5 nodes upstream (what we call "5 step rule").
+Instead of just returning the node with the highest score, ybyra selects the *optimal placement* — the highest-scoring node which is supported by at least one other derived hit within `step_size` nodes upstream (default: 5), what we call the "step rule". Setting `step_size: 0` disables the rule.
 
 In the case of the optimal placement including ancestral calls, the sample is flagged as `unstable_downstream`.
 
 
 ### Score Ties
 
-When multiple nodes have the same top tree score  (often in low-coverage or low-resolution areas) and all pass the 5 step rule:
+When multiple nodes have the same top tree score  (often in low-coverage or low-resolution areas) and all pass the step rule:
 
 - The sample is flagged as `score_tie`
 - ybyra selects the Most Recent Common Ancestor (MRCA) of all tied nodes with a derived hit as optimal placement
@@ -174,7 +174,7 @@ This is the summary output table. Columns:
 - `unstable_downstream`: Ancestral calls at optimal placement is different from 0
 - `score_tie;most_recent_common_parent`: Multiple nodes tied for high score; optimal placement is the most recent common ancestor of the tied nodes with a derived hit
 -  `tree_score_below_50`:  Low confidence placement (low-coverage)
-- `step_rule`:  Higher scoring nodes failed the 5 step rule
+- `step_rule`:  Higher scoring nodes failed the step rule
 
 If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `workflow/scripts/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.
 
@@ -227,9 +227,9 @@ Summarizes score ties information per individual.
 This is the score ties summary output plot, showing the full path and relationship between all possible placement nodes of individuals in `scoreties.yplace`.
 
 
-### `step5nopass.yplace`
+### `stepnopass.yplace`
 
-List all nodes for all samples which failed the 5 step rule.
+List all nodes for all samples which failed the step rule. Empty (header only) when the rule is disabled.
 
 | Column | Description |
 |--------|-------------|

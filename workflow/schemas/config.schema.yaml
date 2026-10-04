@@ -40,7 +40,7 @@ properties:
     minimum: 0
   step_size:
     type: integer
-    minimum: 1
+    minimum: 0
   custom:
     $ref: "#/$defs/ref_data_block"
   hg37_ftdna:

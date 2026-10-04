@@ -56,6 +56,8 @@ def find_common_parent(ties, all_nodes):
 
 def has_upstream_support(node, all_nodes, step_size):
     """STEP RULE: check if upstream nodes within the step size have derived hits"""
+    if step_size == 0:
+        return True  # rule disabled
     if node not in all_nodes:
         return False
 
@@ -90,7 +92,7 @@ def main(files, step_size=5):
     with open("unstabledownstream.yplace", 'w') as out:
         out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
 
-    with open(f"step{step_size}nopass.yplace", 'w') as out:
+    with open("stepnopass.yplace", 'w') as out:
         out.write("individual\tid\tscore\ttree_path\n")
 
     with open("fail.yplace", 'w') as out:
@@ -154,7 +156,7 @@ def main(files, step_size=5):
                 passed = True
                 break
             else:
-                with open(f"step{step_size}nopass.yplace", 'a') as out:
+                with open("stepnopass.yplace", 'a') as out:
                     out.write(f"{individual}\t{node}\t{score}\t{path}\n")
 
         if not passed:
@@ -184,8 +186,10 @@ if __name__ == "__main__":
         "--step-size",
         type=int,
         default=5,
-        help="Step size to check upstream nodes (default: 5)"
+        help="Step size to check upstream nodes; 0 disables the step rule (default: 5)"
     )
     args = parser.parse_args()
+    if args.step_size < 0:
+        parser.error("--step-size must be >= 0")
 
     main(args.files, step_size=args.step_size)
