@@ -253,6 +253,7 @@ List all individuals with `tree_score` below `min_tree_score` (default: 10), wit
 - `below_min_tree_score`: No node reaches the minimum tree score
 - `below_min_tree_score_after_step_rule`: All nodes above the minimum tree score failed the step rule
 - `below_min_tree_score_after_score_tie`: The MRCA of the tied top-scoring nodes is below the minimum tree score
+- `score_tie_without_common_parent`: Tied top-scoring nodes without a common ancestor with a derived hit (rare)
 
 ## Per Sample Output Files
 

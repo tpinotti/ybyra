@@ -30,12 +30,14 @@ CLASSES = {
     "other lineage":            "#e41a1c",
     "failed (low score)":       "#bdbdbd",
     "failed (step rule)":       "#525252",
+    "failed (score tie)":       "#a65628",
     "placed (baseline failed)": "#ff7f00",
 }
 FAIL_CLASSES = {
     "below_min_tree_score": "failed (low score)",
     "below_min_tree_score_after_step_rule": "failed (step rule)",
     "below_min_tree_score_after_score_tie": "failed (low score)",
+    "score_tie_without_common_parent": "failed (score tie)",
 }
 DEPTH_BINS = [0, 0.1, 0.5, 1, 5, float("inf")]
 DEPTH_LABELS = ["< 0.1x", "0.1-0.5x", "0.5-1x", "1-5x", "> 5x"]
@@ -180,7 +182,8 @@ def plot_samples(rows, steps, baseline_step, baseline_name, out_file):
         f"{len(changed)} of {len(samples)} samples shown; the other {len(samples) - len(changed)} "
         f"have the same placement at all step sizes. Baseline: {baseline_name}."
     )
-    legend = [Patch(color=c, label=cls) for cls, c in CLASSES.items()]
+    shown = {r["class"] for s in changed for r in samples[s].values()}
+    legend = [Patch(color=c, label=cls) for cls, c in CLASSES.items() if cls in shown]
 
     with PdfPages(out_file) as pdf:
         if not changed:

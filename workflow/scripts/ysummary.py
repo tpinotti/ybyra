@@ -106,11 +106,13 @@ def summarize_sample(file, step_size=5, min_tree_score=10, low_tree_score=50):
         shortest_path, common_parent = find_common_parent(ties, all_nodes)
         result["ties_summary"] = (shortest_path, common_parent)
 
-        # Always use MRCA for tie resolution
-        if common_parent:
-            best_placement = common_parent
-            best_path = all_nodes[common_parent][3]
-            flag_parts.append("most_recent_common_parent")
+        # Always use MRCA for tie resolution. Without one, the tied lineages conflict.
+        if not common_parent:
+            result["fail_flag"] = "score_tie_without_common_parent"
+            return result
+        best_placement = common_parent
+        best_path = all_nodes[common_parent][3]
+        flag_parts.append("most_recent_common_parent")
 
     step_rule_applied = False
 
