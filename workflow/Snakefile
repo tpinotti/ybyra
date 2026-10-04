@@ -156,8 +156,8 @@ rule Ytree:
        nopass="calls/{sample}.nopass",
     params:
        sm="{sample}",
-       lib = lambda wildcards: config.get("lib_type", "both"),
-       dmg = lambda wildcards: config.get("damage_model", "none"),
+       lib = config["lib_type"],
+       dmg = config["damage_model"],
        min_majority_fraction = config["min_majority_fraction"]
     conda:
         "envs/ybyra.yaml"
@@ -178,7 +178,7 @@ rule Yplace:
     output:
         "yplace/{sample}.yplace"
     params:
-        damage = lambda wildcards: "--no-damage" if config.get("damage_filter", False) else ""
+        damage = "--no-damage" if config["damage_filter"] else ""
     conda:
         "envs/ybyra.yaml"
     shell:
@@ -191,7 +191,12 @@ rule aggregate_yplace:
     input:
         yplacefiles
     output:
-        aggfile
+        aggfile,
+        "scoreties.yplace",
+        "scoreties_summary.yplace",
+        "unstabledownstream.yplace",
+        "stepnopass.yplace",
+        "fail.yplace"
     params:
         step_size = config["step_size"],
         min_tree_score = config["min_tree_score"],
@@ -221,7 +226,7 @@ rule plot_aggregate:
 
 rule plot_scoreties:
     input:
-        agg = aggfile
+        "scoreties.yplace"
     output:
         "scoreties.pdf"
     conda:
@@ -229,5 +234,5 @@ rule plot_scoreties:
     shell:
         """
         export QT_QPA_PLATFORM=offscreen
-        python {workflow.basedir}/scripts/yplot.py scoreties.yplace {output}
+        python {workflow.basedir}/scripts/yplot.py {input} {output}
         """
