@@ -38,6 +38,9 @@ properties:
   MQ:
     type: integer
     minimum: 0
+  BQ:
+    type: integer
+    minimum: 0
   min_majority_fraction:
     type: number
     minimum: 0
@@ -73,6 +76,7 @@ required:
   - damage_model
   - prefix
   - MQ
+  - BQ
   - min_majority_fraction
   - step_size
   - min_tree_score

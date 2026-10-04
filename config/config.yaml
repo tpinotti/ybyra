@@ -57,6 +57,10 @@ prefix: "ybyra"
 # Mapping quality filter applied to the bam files.
 MQ: 30
 
+# Minimum base quality for genotype calling.
+# Ancient DNA data might benefit from a higher value.
+BQ: 1
+
 # Minimum fraction of reads that need to support the ref or alt allele
 # for a call to be used. Set to 0 to disable this filter.
 min_majority_fraction: 0.7

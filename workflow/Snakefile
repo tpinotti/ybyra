@@ -17,6 +17,7 @@ validate(config, "schemas/config.schema.yaml")
 REF_GENOME = config["ref_genome"] ## path to reference genomes in .fasta format
 PREFIX = config["prefix"] ## prefix for output files
 MQ = config["MQ"] ## minimum mapping quality
+BQ = config["BQ"] ## minimum base quality
 
 # We use paths relative to the project root dir here if paths are relative,
 # accounting for them either being in the working dir (perferred), or in the
@@ -113,7 +114,7 @@ rule get_vcf:
     shell:
         """
         echo -e {params.sm} > vcf/{params.sm}.samples.txt
-        bcftools mpileup -B -q {MQ} -f {REF_GENOME} {params.regions} --ignore-RG {input} \
+        bcftools mpileup -B -q {MQ} -Q {BQ} -f {REF_GENOME} {params.regions} --ignore-RG {input} \
             | bcftools reheader -s vcf/{params.sm}.samples.txt \
             | bcftools call -Am -Oz --ploidy 1 > {output}
         """
