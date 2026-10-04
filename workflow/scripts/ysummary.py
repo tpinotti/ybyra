@@ -2,7 +2,7 @@ import sys
 import argparse
 import os
 
-def parse_yplace(file):
+def parse_yplace(file, min_tree_score):
     best_placement = None
     best_score = float('-inf')
     best_path = ""
@@ -22,7 +22,7 @@ def parse_yplace(file):
 
             all_nodes[node] = (derived, ancestral, score, path)
 
-            if score >= 10:
+            if score >= min_tree_score:
                 if score > best_score:
                     best_score = score
                     best_placement = node
@@ -79,7 +79,7 @@ def has_upstream_support(node, all_nodes, step_size):
     return False
 
 
-def main(files, step_size=5):
+def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
     with open("aggregate.yplace", 'w') as out:
         out.write("individual\toptplacement\ttree_score\tflag\ttree_path\n")
 
@@ -104,17 +104,17 @@ def main(files, step_size=5):
         if not os.path.getsize(file):
             continue
 
-        best_placement, best_score, best_path, best_ancestral, ties, all_nodes = parse_yplace(file)
+        best_placement, best_score, best_path, best_ancestral, ties, all_nodes = parse_yplace(file, min_tree_score)
 
-        if not best_placement or best_score < 10:
+        if not best_placement or best_score < min_tree_score:
             with open("fail.yplace", 'a') as out:
-                out.write(f"{individual}\tscore_below_10\n")
+                out.write(f"{individual}\tbelow_min_tree_score\n")
             continue
 
         flag_parts = []
 
-        if best_score < 50:
-            flag_parts.append("tree_score_below_50")
+        if best_score < low_tree_score:
+            flag_parts.append("low_tree_score")
 
         if len(ties) > 1:
             flag_parts.append("score_tie")
@@ -144,7 +144,7 @@ def main(files, step_size=5):
         passed = False
         for i in range(start_index, len(candidates)):
             node, (derived, ancestral, score, path) = candidates[i]
-            if score < 10:
+            if score < min_tree_score:
                 break  # label as fail
 
             if has_upstream_support(node, all_nodes, step_size):
@@ -161,7 +161,7 @@ def main(files, step_size=5):
 
         if not passed:
             with open("fail.yplace", 'a') as out:
-                out.write(f"{individual}\tscore_below_10\n")
+                out.write(f"{individual}\tbelow_min_tree_score_after_step_rule\n")
             continue
 
         if step_rule_applied:
@@ -188,8 +188,25 @@ if __name__ == "__main__":
         default=5,
         help="Step size to check upstream nodes; 0 disables the step rule (default: 5)"
     )
+    parser.add_argument(
+        "--min-tree-score",
+        type=int,
+        default=10,
+        help="Minimum tree score for a placement; samples below fail (default: 10)"
+    )
+    parser.add_argument(
+        "--low-tree-score",
+        type=int,
+        default=50,
+        help="Placements below this tree score are flagged as low_tree_score (default: 50)"
+    )
     args = parser.parse_args()
     if args.step_size < 0:
         parser.error("--step-size must be >= 0")
 
-    main(args.files, step_size=args.step_size)
+    main(
+        args.files,
+        step_size=args.step_size,
+        min_tree_score=args.min_tree_score,
+        low_tree_score=args.low_tree_score
+    )

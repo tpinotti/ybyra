@@ -63,6 +63,12 @@ MQ: 30
 # Set to 0 to disable the step rule.
 step_size: 5
 
+# Minimum tree score for a placement. Samples below are listed in fail.yplace.
+min_tree_score: 10
+
+# Placements with a tree score below this are flagged as low_tree_score.
+low_tree_score: 50
+
 # ============================================================
 #     Reference data
 # ============================================================

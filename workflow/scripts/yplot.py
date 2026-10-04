@@ -25,9 +25,9 @@ with open(input_file) as f:
         inverted_path = list(reversed(fields[tree_idx].split("<")))
         paths.append(inverted_path)
 
-        # Append "**" if flag column exists and contains "tree_score_below_50"
+        # Append "**" if flag column exists and contains "low_tree_score"
         sample_name = fields[sample_idx]
-        if flag_idx is not None and "tree_score_below_50" in fields[flag_idx]:
+        if flag_idx is not None and "low_tree_score" in fields[flag_idx]:
             sample_name += "**"
         samples.append(sample_name)
 

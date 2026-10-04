@@ -190,13 +190,17 @@ rule aggregate_yplace:
     output:
         aggfile
     params:
-        step_size = config["step_size"]
+        step_size = config["step_size"],
+        min_tree_score = config["min_tree_score"],
+        low_tree_score = config["low_tree_score"]
     conda:
         "envs/ybyra.yaml"
     shell:
         """
         python {workflow.basedir}/scripts/ysummary.py \
-            {input} --step-size {params.step_size}
+            {input} --step-size {params.step_size} \
+            --min-tree-score {params.min_tree_score} \
+            --low-tree-score {params.low_tree_score}
         """
 
 rule plot_aggregate:

@@ -74,7 +74,7 @@ void setup_summary( CLI::App& app )
     options->exclude_flags.option = sub->add_option(
         "--exclude-flags",
         options->exclude_flags.value,
-        "Comma-separated list of ybyra flags, such as `tree_score_below_50`. "
+        "Comma-separated list of ybyra flags, such as `low_tree_score`. "
         "Samples whose placement has any of these flags are not counted."
     );
     options->exclude_flags.option->delimiter( ',' );

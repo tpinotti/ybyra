@@ -173,7 +173,7 @@ This is the summary output table. Columns:
 
 - `unstable_downstream`: Ancestral calls at optimal placement is different from 0
 - `score_tie;most_recent_common_parent`: Multiple nodes tied for high score; optimal placement is the most recent common ancestor of the tied nodes with a derived hit
--  `tree_score_below_50`:  Low confidence placement (low-coverage)
+- `low_tree_score`: Low confidence placement (low-coverage), with a tree score below `low_tree_score` (default: 50)
 - `step_rule`:  Higher scoring nodes failed the step rule
 
 If you prefer the `tree_path` direction to be root-to-tip instead, a little helper script `workflow/scripts/ynvert.py` takes an `aggregate.yplace` file and outputs it with inverted `tree_path`.
@@ -182,7 +182,7 @@ If you prefer the `tree_path` direction to be root-to-tip instead, a little help
 
 This is the summary output plot, showing the full path and relationship between all individuals in `aggregate.yplace`.
 
-Individuals with the `tree_score_below_50` flag are denoted with a ** symbol.
+Individuals with the `low_tree_score` flag are denoted with a ** symbol.
 
 ### `unstabledownstream.yplace`
 
@@ -240,7 +240,10 @@ List all nodes for all samples which failed the step rule. Empty (header only) w
 
 ### `fail.yplace`
 
-List all individuals with `tree_score` below 10.
+List all individuals with `tree_score` below `min_tree_score` (default: 10), with one of these flags:
+
+- `below_min_tree_score`: No node reaches the minimum tree score
+- `below_min_tree_score_after_step_rule`: All nodes above the minimum tree score failed the step rule
 
 ## Per Sample Output Files
 

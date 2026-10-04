@@ -46,6 +46,6 @@ The resulting `aggregate.yplace` should be identical to `expected_aggregate.ypla
 
 Seven of the nine samples are placed in `aggregate.yplace`. Six of them are placed confidently (no flags, shown as `...`): five in haplogroup I (I-FGC7113, I-L160, I-M26) and one in G (G-FGC34625).
 
-The low-coverage sample I7691 is only placed at R-M173, with a tree score of 16 (marked with `**` in the plot). Three nodes within R-M269 tie for the highest score, each supported by a single derived SNP (see `scoreties.yplace`). Their common ancestor R-M269 however fails the step rule (see `stepnopass.yplace`), so the placement falls back to R-M173, hence the flags `tree_score_below_50;score_tie;most_recent_common_parent;step_rule`.
+The low-coverage sample I7691 is only placed at R-M173, with a tree score of 16 (marked with `**` in the plot). Three nodes within R-M269 tie for the highest score, each supported by a single derived SNP (see `scoreties.yplace`). Their common ancestor R-M269 however fails the step rule (see `stepnopass.yplace`), so the placement falls back to R-M173, hence the flags `low_tree_score;score_tie;most_recent_common_parent;step_rule`.
 
 The two samples with the lowest coverage, I11604 and I7687, have a tree score below 10, and are hence not placed, but listed in `fail.yplace` instead.

@@ -41,6 +41,10 @@ properties:
   step_size:
     type: integer
     minimum: 0
+  min_tree_score:
+    type: integer
+  low_tree_score:
+    type: integer
   custom:
     $ref: "#/$defs/ref_data_block"
   hg37_ftdna:
@@ -66,4 +70,6 @@ required:
   - prefix
   - MQ
   - step_size
+  - min_tree_score
+  - low_tree_score
 additionalProperties: false
