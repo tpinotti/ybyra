@@ -45,7 +45,7 @@ for name in hg37_ftdna hg37_isogg hg37_yfull; do
 
     if ! run_snakemake "${dir}" --cores "${CORES}"; then
         fail "${name}" "snakemake failed, see ${dir}/snakemake.log"
-    elif [ ! -s "${dir}/aggregate.pdf" ] || [ ! -s "${dir}/scoreties.pdf" ]; then
+    elif [ ! -s "${dir}/aggregate.pdf" ] || [ ! -s "${dir}/score_ties.pdf" ]; then
         fail "${name}" "plots missing or empty"
     elif ${UPDATE}; then
         cp "${dir}/aggregate.yplace" "${expected}"

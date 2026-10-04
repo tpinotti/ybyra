@@ -40,7 +40,7 @@ jobs:
           snakemake --cores 2 --directory example
           diff example/expected_aggregate.yplace example/aggregate.yplace
           test -s example/aggregate.pdf
-          test -s example/scoreties.pdf
+          test -s example/score_ties.pdf
 
       - name: Run tests
         if: success() || failure()

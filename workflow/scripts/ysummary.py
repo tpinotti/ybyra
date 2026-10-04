@@ -83,16 +83,16 @@ def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
     with open("aggregate.yplace", 'w') as out:
         out.write("individual\toptplacement\ttree_score\tflag\ttree_path\n")
 
-    with open("scoreties.yplace", 'w') as out:
+    with open("score_ties.yplace", 'w') as out:
         out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
 
-    with open("scoreties_summary.yplace", 'w') as out:
+    with open("score_ties_summary.yplace", 'w') as out:
         out.write("individual\tshortest_path_to_root\tmost_recent_common_parent\n")
 
-    with open("unstabledownstream.yplace", 'w') as out:
+    with open("unstable_downstream.yplace", 'w') as out:
         out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
 
-    with open("stepnopass.yplace", 'w') as out:
+    with open("step_rule_nopass.yplace", 'w') as out:
         out.write("individual\tid\tscore\ttree_path\n")
 
     with open("fail.yplace", 'w') as out:
@@ -119,14 +119,14 @@ def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
         if len(ties) > 1:
             flag_parts.append("score_tie")
 
-            with open("scoreties.yplace", 'a') as out:
+            with open("score_ties.yplace", 'a') as out:
                 for node in ties:
                     derived, ancestral, score, path = all_nodes[node]
                     out.write(f"{individual}\t{node}\t{derived}\t{ancestral}\t{score}\t{path}\n")
 
             shortest_path, common_parent = find_common_parent(ties, all_nodes)
 
-            with open("scoreties_summary.yplace", 'a') as out:
+            with open("score_ties_summary.yplace", 'a') as out:
                 out.write(f"{individual}\t{shortest_path}\t{common_parent if common_parent else 'None'}\n")
 
             # Always use MRCA for tie resolution
@@ -156,7 +156,7 @@ def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
                 passed = True
                 break
             else:
-                with open("stepnopass.yplace", 'a') as out:
+                with open("step_rule_nopass.yplace", 'a') as out:
                     out.write(f"{individual}\t{node}\t{score}\t{path}\n")
 
         if not passed:
@@ -170,7 +170,7 @@ def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
         derived, ancestral, _, _ = all_nodes[best_placement]
         if ancestral != 0:
             flag_parts.append("unstable_downstream")
-            with open("unstabledownstream.yplace", 'a') as out:
+            with open("unstable_downstream.yplace", 'a') as out:
                 out.write(f"{individual}\t{best_placement}\t{derived}\t{ancestral}\t{best_score}\t{best_path}\n")
 
         flag = ";".join(flag_parts) if flag_parts else "..."

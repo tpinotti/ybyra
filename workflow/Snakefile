@@ -73,7 +73,7 @@ callfiles = expand("calls/{sample}.calls", sample=SAMPLES)
 yplacefiles = expand("yplace/{sample}.yplace", sample=SAMPLES)
 aggfile = "aggregate.yplace"
 aggplot = "aggregate.pdf"
-scoretiesplot = "scoreties.pdf"
+score_ties_plot = "score_ties.pdf"
 
 ## --------------------------------------------------------------------------------
 ## targets
@@ -84,7 +84,7 @@ rule all:
         yplacefiles,
         aggfile,
         aggplot,
-        scoretiesplot
+        score_ties_plot
 
 ## --------------------------------------------------------------------------------
 ## rules
@@ -192,10 +192,10 @@ rule aggregate_yplace:
         yplacefiles
     output:
         aggfile,
-        "scoreties.yplace",
-        "scoreties_summary.yplace",
-        "unstabledownstream.yplace",
-        "stepnopass.yplace",
+        "score_ties.yplace",
+        "score_ties_summary.yplace",
+        "unstable_downstream.yplace",
+        "step_rule_nopass.yplace",
         "fail.yplace"
     params:
         step_size = config["step_size"],
@@ -224,11 +224,11 @@ rule plot_aggregate:
         python {workflow.basedir}/scripts/yplot.py {input} {output}
         """
 
-rule plot_scoreties:
+rule plot_score_ties:
     input:
-        "scoreties.yplace"
+        "score_ties.yplace"
     output:
-        "scoreties.pdf"
+        "score_ties.pdf"
     conda:
         "envs/ybyra.yaml"
     shell:

@@ -184,7 +184,7 @@ This is the summary output plot, showing the full path and relationship between 
 
 Individuals with the `low_tree_score` flag are denoted with a ** symbol.
 
-### `unstabledownstream.yplace`
+### `unstable_downstream.yplace`
 
 Details on nodes of individuals where the optimal placement contains ancestral SNPs (flag: `unstable_downstream`).
 
@@ -198,7 +198,7 @@ Details on nodes of individuals where the optimal placement contains ancestral S
 | `tree_path` | Tip-to-root path |
 
 
-### `scoreties.yplace`
+### `score_ties.yplace`
 
 Lists all nodes with tied maximum scores (flag: `score_tie`).
 
@@ -212,7 +212,7 @@ Lists all nodes with tied maximum scores (flag: `score_tie`).
 | `tree_path` | Tip-to-root path |
 
 
-### `scoreties_summary.yplace`
+### `score_ties_summary.yplace`
 
 Summarizes score ties information per individual.
 
@@ -222,12 +222,12 @@ Summarizes score ties information per individual.
 | `shortest_path_to_root` | Closest tied node to the root |
 | `most_recent_common_parent` | Shared ancestor of tied nodes |
 
-### `scoreties.pdf`
+### `score_ties.pdf`
 
-This is the score ties summary output plot, showing the full path and relationship between all possible placement nodes of individuals in `scoreties.yplace`.
+This is the score ties summary output plot, showing the full path and relationship between all possible placement nodes of individuals in `score_ties.yplace`.
 
 
-### `stepnopass.yplace`
+### `step_rule_nopass.yplace`
 
 List all nodes for all samples which failed the step rule. Empty (header only) when the rule is disabled.
 
