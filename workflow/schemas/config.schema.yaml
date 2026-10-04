@@ -52,6 +52,14 @@ properties:
     type: integer
   low_tree_score:
     type: integer
+  step_size_exploration:
+    type: boolean
+  step_size_exploration_baseline:
+    type: string
+    enum: [step_size, "off"]
+  step_size_exploration_max:
+    type: integer
+    minimum: 1
   custom:
     $ref: "#/$defs/ref_data_block"
   hg37_ftdna:
@@ -81,4 +89,7 @@ required:
   - step_size
   - min_tree_score
   - low_tree_score
+  - step_size_exploration
+  - step_size_exploration_baseline
+  - step_size_exploration_max
 additionalProperties: false

@@ -74,6 +74,9 @@ yplacefiles = expand("yplace/{sample}.yplace", sample=SAMPLES)
 aggfile = "aggregate.yplace"
 aggplot = "aggregate.pdf"
 score_ties_plot = "score_ties.pdf"
+step_size_files = [
+    "step_size/step_size.tsv", "step_size/overview.pdf", "step_size/samples.pdf"
+] if config["step_size_exploration"] else []
 
 ## --------------------------------------------------------------------------------
 ## targets
@@ -84,7 +87,8 @@ rule all:
         yplacefiles,
         aggfile,
         aggplot,
-        score_ties_plot
+        score_ties_plot,
+        step_size_files
 
 ## --------------------------------------------------------------------------------
 ## rules
@@ -209,6 +213,35 @@ rule aggregate_yplace:
             {input} --step-size {params.step_size} \
             --min-tree-score {params.min_tree_score} \
             --low-tree-score {params.low_tree_score}
+        """
+
+rule step_size_exploration:
+    input:
+        yplace=yplacefiles,
+        calls=callfiles,
+        nopass=expand("calls/{sample}.nopass", sample=SAMPLES)
+    output:
+        "step_size/step_size.tsv",
+        "step_size/overview.pdf",
+        "step_size/samples.pdf"
+    params:
+        step_size = config["step_size"],
+        baseline = config["step_size_exploration_baseline"],
+        max_step = config["step_size_exploration_max"],
+        min_tree_score = config["min_tree_score"],
+        low_tree_score = config["low_tree_score"]
+    conda:
+        "envs/ybyra.yaml"
+    shell:
+        """
+        python {workflow.basedir}/scripts/ystep.py \
+            --tree {REF_TREE} --info {REF_INFO} \
+            --yplace {input.yplace} --calls {input.calls} \
+            --step-size {params.step_size} --baseline {params.baseline} \
+            --max-step {params.max_step} \
+            --min-tree-score {params.min_tree_score} \
+            --low-tree-score {params.low_tree_score} \
+            --out-dir step_size
         """
 
 rule plot_aggregate:

@@ -7,6 +7,7 @@ dependencies:
   - python <= 3.12
   - pandas
   - numpy
+  - matplotlib
   - ete3 <= 3.1.3
   - bcftools
   - samtools

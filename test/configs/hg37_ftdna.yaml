@@ -4,3 +4,4 @@ ref_data: "hg37_ftdna"
 lib_type: "both"
 damage_filter: true
 damage_model: "bi"
+step_size_exploration: true

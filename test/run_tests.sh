@@ -35,6 +35,19 @@ run_snakemake() {
         > "${dir}/snakemake.log" 2>&1
 }
 
+# If the step size exploration was run, check that its outputs exist, and that its placements at
+# the configured step size are the ones in aggregate.yplace.
+check_step_size() {
+    local dir="$1"
+    grep -q "^step_size_exploration: true" "${dir}/config.yaml" || return 0
+    for f in step_size.tsv overview.pdf samples.pdf; do
+        [ -s "${dir}/step_size/${f}" ] || return 1
+    done
+    diff <(awk -F'\t' 'NR > 1 { print $1, $2, $3 }' "${dir}/aggregate.yplace" | sort) \
+         <(awk -F'\t' 'NR > 1 && $4 == "True" && $5 != "" { print $1, $5, $6 }' \
+            "${dir}/step_size/step_size.tsv" | sort) > /dev/null
+}
+
 rm -rf "${OUT_DIR}"
 
 # Full runs with each tree, compared to the expected results.
@@ -47,6 +60,8 @@ for name in hg37_ftdna hg37_isogg hg37_yfull; do
         fail "${name}" "snakemake failed, see ${dir}/snakemake.log"
     elif [ ! -s "${dir}/aggregate.pdf" ] || [ ! -s "${dir}/score_ties.pdf" ]; then
         fail "${name}" "plots missing or empty"
+    elif ! check_step_size "${dir}"; then
+        fail "${name}" "step size exploration missing, or inconsistent with aggregate.yplace"
     elif ${UPDATE}; then
         cp "${dir}/aggregate.yplace" "${expected}"
         echo "UPDATE  ${name}"

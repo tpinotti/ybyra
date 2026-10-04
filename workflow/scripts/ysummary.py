@@ -79,104 +79,120 @@ def has_upstream_support(node, all_nodes, step_size):
     return False
 
 
+def summarize_sample(file, step_size=5, min_tree_score=10, low_tree_score=50):
+    """
+    Get the placement of a sample from its yplace file. Returns a dict with the placement,
+    or `placement` None and the reason in `fail_flag` if the sample fails, as well as the
+    score ties, step rule nopass nodes, and unstable downstream counts of the sample.
+    """
+    result = {
+        "placement": None, "score": None, "flag": None, "path": None, "fail_flag": None,
+        "ties": [], "ties_summary": None, "step_rule_nopass": [], "unstable": None
+    }
+    best_placement, best_score, best_path, best_ancestral, ties, all_nodes = parse_yplace(file, min_tree_score)
+
+    if not best_placement or best_score < min_tree_score:
+        result["fail_flag"] = "below_min_tree_score"
+        return result
+
+    flag_parts = []
+
+    if best_score < low_tree_score:
+        flag_parts.append("low_tree_score")
+
+    if len(ties) > 1:
+        flag_parts.append("score_tie")
+        result["ties"] = [(node, *all_nodes[node]) for node in ties]
+        shortest_path, common_parent = find_common_parent(ties, all_nodes)
+        result["ties_summary"] = (shortest_path, common_parent)
+
+        # Always use MRCA for tie resolution
+        if common_parent:
+            best_placement = common_parent
+            best_path = all_nodes[common_parent][3]
+            flag_parts.append("most_recent_common_parent")
+
+    step_rule_applied = False
+
+    candidates = sorted(all_nodes.items(), key=lambda x: -x[1][2])
+
+    start_index = next((i for i, (n, _) in enumerate(candidates) if n == best_placement), 0)
+
+    passed = False
+    for i in range(start_index, len(candidates)):
+        node, (derived, ancestral, score, path) = candidates[i]
+        if score < min_tree_score:
+            break  # label as fail
+
+        if has_upstream_support(node, all_nodes, step_size):
+            if node != best_placement:
+                step_rule_applied = True
+            best_placement = node
+            best_score = score
+            best_path = path
+            passed = True
+            break
+        else:
+            result["step_rule_nopass"].append((node, score, path))
+
+    if not passed:
+        result["fail_flag"] = "below_min_tree_score_after_step_rule"
+        return result
+
+    if step_rule_applied:
+        flag_parts.append("step_rule")
+
+    derived, ancestral, _, _ = all_nodes[best_placement]
+    if ancestral != 0:
+        flag_parts.append("unstable_downstream")
+        result["unstable"] = (derived, ancestral)
+
+    result["placement"] = best_placement
+    result["score"] = best_score
+    result["path"] = best_path
+    result["flag"] = ";".join(flag_parts) if flag_parts else "..."
+    return result
+
+
 def main(files, step_size=5, min_tree_score=10, low_tree_score=50):
-    with open("aggregate.yplace", 'w') as out:
-        out.write("individual\toptplacement\ttree_score\tflag\ttree_path\n")
+    with open("aggregate.yplace", 'w') as agg, \
+         open("score_ties.yplace", 'w') as ties, \
+         open("score_ties_summary.yplace", 'w') as ties_summary, \
+         open("unstable_downstream.yplace", 'w') as unstable, \
+         open("step_rule_nopass.yplace", 'w') as nopass, \
+         open("fail.yplace", 'w') as fail:
 
-    with open("score_ties.yplace", 'w') as out:
-        out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
+        agg.write("individual\toptplacement\ttree_score\tflag\ttree_path\n")
+        ties.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
+        ties_summary.write("individual\tshortest_path_to_root\tmost_recent_common_parent\n")
+        unstable.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
+        nopass.write("individual\tid\tscore\ttree_path\n")
+        fail.write("individual\tflag\n")
 
-    with open("score_ties_summary.yplace", 'w') as out:
-        out.write("individual\tshortest_path_to_root\tmost_recent_common_parent\n")
+        for file in files:
+            individual = os.path.basename(file).replace(".yplace", "")
 
-    with open("unstable_downstream.yplace", 'w') as out:
-        out.write("individual\tid\tderived\tancestral\ttree_score\ttree_path\n")
+            if not os.path.getsize(file):
+                continue
 
-    with open("step_rule_nopass.yplace", 'w') as out:
-        out.write("individual\tid\tscore\ttree_path\n")
+            r = summarize_sample(file, step_size, min_tree_score, low_tree_score)
 
-    with open("fail.yplace", 'w') as out:
-        out.write("individual\tflag\n")
+            for node, derived, ancestral, score, path in r["ties"]:
+                ties.write(f"{individual}\t{node}\t{derived}\t{ancestral}\t{score}\t{path}\n")
+            if r["ties_summary"]:
+                shortest_path, common_parent = r["ties_summary"]
+                ties_summary.write(f"{individual}\t{shortest_path}\t{common_parent if common_parent else 'None'}\n")
+            for node, score, path in r["step_rule_nopass"]:
+                nopass.write(f"{individual}\t{node}\t{score}\t{path}\n")
 
-    for file in files:
-        individual = os.path.basename(file).replace(".yplace", "")
+            if r["placement"] is None:
+                fail.write(f"{individual}\t{r['fail_flag']}\n")
+                continue
 
-        if not os.path.getsize(file):
-            continue
-
-        best_placement, best_score, best_path, best_ancestral, ties, all_nodes = parse_yplace(file, min_tree_score)
-
-        if not best_placement or best_score < min_tree_score:
-            with open("fail.yplace", 'a') as out:
-                out.write(f"{individual}\tbelow_min_tree_score\n")
-            continue
-
-        flag_parts = []
-
-        if best_score < low_tree_score:
-            flag_parts.append("low_tree_score")
-
-        if len(ties) > 1:
-            flag_parts.append("score_tie")
-
-            with open("score_ties.yplace", 'a') as out:
-                for node in ties:
-                    derived, ancestral, score, path = all_nodes[node]
-                    out.write(f"{individual}\t{node}\t{derived}\t{ancestral}\t{score}\t{path}\n")
-
-            shortest_path, common_parent = find_common_parent(ties, all_nodes)
-
-            with open("score_ties_summary.yplace", 'a') as out:
-                out.write(f"{individual}\t{shortest_path}\t{common_parent if common_parent else 'None'}\n")
-
-            # Always use MRCA for tie resolution
-            if common_parent:
-                best_placement = common_parent
-                best_path = all_nodes[common_parent][3]
-                flag_parts.append("most_recent_common_parent")
-
-        step_rule_applied = False
-
-        candidates = sorted(all_nodes.items(), key=lambda x: -x[1][2])
-
-        start_index = next((i for i, (n, _) in enumerate(candidates) if n == best_placement), 0)
-
-        passed = False
-        for i in range(start_index, len(candidates)):
-            node, (derived, ancestral, score, path) = candidates[i]
-            if score < min_tree_score:
-                break  # label as fail
-
-            if has_upstream_support(node, all_nodes, step_size):
-                if node != best_placement:
-                    step_rule_applied = True
-                best_placement = node
-                best_score = score
-                best_path = path
-                passed = True
-                break
-            else:
-                with open("step_rule_nopass.yplace", 'a') as out:
-                    out.write(f"{individual}\t{node}\t{score}\t{path}\n")
-
-        if not passed:
-            with open("fail.yplace", 'a') as out:
-                out.write(f"{individual}\tbelow_min_tree_score_after_step_rule\n")
-            continue
-
-        if step_rule_applied:
-            flag_parts.append("step_rule")
-
-        derived, ancestral, _, _ = all_nodes[best_placement]
-        if ancestral != 0:
-            flag_parts.append("unstable_downstream")
-            with open("unstable_downstream.yplace", 'a') as out:
-                out.write(f"{individual}\t{best_placement}\t{derived}\t{ancestral}\t{best_score}\t{best_path}\n")
-
-        flag = ";".join(flag_parts) if flag_parts else "..."
-
-        with open("aggregate.yplace", 'a') as out:
-            out.write(f"{individual}\t{best_placement}\t{best_score}\t{flag}\t{best_path}\n")
+            if r["unstable"]:
+                derived, ancestral = r["unstable"]
+                unstable.write(f"{individual}\t{r['placement']}\t{derived}\t{ancestral}\t{r['score']}\t{r['path']}\n")
+            agg.write(f"{individual}\t{r['placement']}\t{r['score']}\t{r['flag']}\t{r['path']}\n")
 
 
 if __name__ == "__main__":

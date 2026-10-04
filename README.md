@@ -141,6 +141,14 @@ When multiple nodes have the same top tree score  (often in low-coverage or low-
 - The sample is flagged as `score_tie`
 - ybyra selects the Most Recent Common Ancestor (MRCA) of all tied nodes with a derived hit as optimal placement
 
+### Exploring the Step Size
+
+The step rule trades resolution for robustness: smaller step sizes avoid placements on wrong lineages in low-coverage samples, but place more samples further upstream. To see how your samples are affected, set `step_size_exploration: true`. This places all samples at step sizes 1 to `step_size_exploration_max` (default: 10) and without the step rule, and compares them to the placement at your `step_size` (or without the step rule, see `step_size_exploration_baseline`). Output in `step_size/`:
+
+- `step_size.tsv`: Placement of each sample at each step size, with its class relative to the baseline (identical, upstream, downstream, other lineage, or failed) and the sample depth (average reads per panel SNP)
+- `overview.pdf`: Fraction of samples per class for each step size, and how many placements change, by sample depth
+- `samples.pdf`: Placements of all samples that change with the step size
+
 
 ## Plotting
 

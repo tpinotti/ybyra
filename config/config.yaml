@@ -77,6 +77,18 @@ min_tree_score: 10
 # Placements with a tree score below this are flagged as low_tree_score.
 low_tree_score: 50
 
+# Explore how the placements change with the step size, see the README.
+# Output is written to `step_size/`.
+step_size_exploration: false
+
+# Compare the placements at each step size to the placements at the above
+# `step_size` ("step_size"), or to the placements without the step rule ("off").
+step_size_exploration_baseline: "step_size"
+
+# Largest step size to explore. Steps from 1 to this, and "off", are compared.
+# The above `step_size` is always included.
+step_size_exploration_max: 10
+
 # ============================================================
 #     Reference data
 # ============================================================
