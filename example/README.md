@@ -49,3 +49,21 @@ Seven of the nine samples are placed in `aggregate.yplace`. Six of them are plac
 The low-coverage sample I7691 is only placed at R-M173, with a tree score of 16 (marked with `**` in the plot). Three nodes within R-M269 tie for the highest score, each supported by a single derived SNP (see `score_ties.yplace`). Their common ancestor R-M269 however fails the step rule (see `step_rule_nopass.yplace`), so the placement falls back to R-M173, hence the flags `low_tree_score;score_tie;most_recent_common_parent;step_rule`.
 
 The two samples with the lowest coverage, I11604 and I7687, have a tree score below 10, and are hence not placed, but listed in `fail.yplace` instead.
+
+## Exploring the step size
+
+To see how the [step rule](../README.md#exploring-the-step-size) affects the placements, set the following line in `config.yaml` and run the example again:
+
+```
+step_size_exploration: true
+```
+
+The results are written to `step_size/` in this folder. The overview plot `step_size/overview.pdf` should look like this:
+
+![Expected step size overview](expected_step_size_overview.png)
+
+The left panel shows, for each step size, how the placements compare to those at the default step size of 5. With step sizes 1 to 4, more samples are placed upstream, and at step size 1, I7691 fails the step rule. With step sizes of 6 and above, and without the step rule ("off"), only I7691 changes: it is placed downstream at R-M269 instead of R-M173. The right panel shows the fraction of samples whose placement changes, split by sample depth.
+
+This is a small example with nine low-coverage samples, so it is not representative of a typical dataset. In particular, the two samples I11604 and I7687 have too little data to be placed at any step size, which is why each bar has a large gray "failed (low score)" part. Samples with higher coverage are less affected by the step size, as the right panel shows already for the three samples with more than 0.1 average reads per panel SNP.
+
+`step_size/samples.pdf` shows the placements of all samples that change with the step size, and `step_size/step_size.tsv` lists the placements of all samples at all step sizes.

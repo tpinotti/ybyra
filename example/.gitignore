@@ -9,6 +9,7 @@ vcf/
 tables/
 calls/
 yplace/
+step_size/
 *.yplace
 *.pdf
 !expected_aggregate.yplace
