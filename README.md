@@ -22,12 +22,12 @@ With ybyra you can:
 
 To use ybyra you need:
 
-- `python <= 3.12` (with `pandas`)
-- `snakemake`
-- `bcftools`
-- `ete3 <= 3.1.3` (only for plotting)
+- `python <= 3.12` (with `pandas` and `numpy`)
+- `snakemake >= 8, < 10`
+- `bcftools` and `samtools`
+- `ete3 <= 3.1.3` and `matplotlib` (only for plotting)
 
-A conda env file with these dependencies is provided in `workflow/envs/ybyra.yaml`. Use for instance `micromamba create -f workflow/envs/ybyra.yaml -n ybyra` (or your preferred conda-like tool) to create an environment, and `micromamba activate ybyra` to activate it prior to running the steps below.
+A conda env file with these dependencies is provided in `workflow/envs/ybyra.yaml`, with bcftools and samtools pinned to the tested versions. Use for instance `micromamba create -f workflow/envs/ybyra.yaml -n ybyra` (or your preferred conda-like tool) to create an environment, and `micromamba activate ybyra` to activate it prior to running the steps below.
 
 
 ## Getting Started

@@ -2,12 +2,18 @@ name: ybyra
 channels:
   - conda-forge
   - bioconda
+
 dependencies:
-  - snakemake >= 8.0.0
+  # Snakemake is bounded to the tested major versions; tested with 9.27.0.
+  - snakemake >= 8.0.0, < 10
+
+  # Python fixed here for best reproducibility.
   - python <= 3.12
   - pandas
   - numpy
   - matplotlib
   - ete3 <= 3.1.3
-  - bcftools
-  - samtools
+
+  # The genotype calls depend on these, so they are pinned for reproducibility.
+  - bcftools = 1.25
+  - samtools = 1.25
