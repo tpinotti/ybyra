@@ -67,3 +67,30 @@ The left panel shows, for each step size, how the placements compare to those at
 This is a small example with nine low-coverage samples, so it is not representative of a typical dataset. In particular, the two samples I11604 and I7687 have too little data to be placed at any step size, which is why each bar has a large gray "failed (low score)" part. Samples with higher coverage are less affected by the step size, as the right panel shows already for the three samples with more than 0.1 average reads per panel SNP.
 
 `step_size/samples.pdf` shows the placements of all samples that change with the step size, and `step_size/step_size.tsv` lists the placements of all samples at all step sizes.
+
+## Plotting with ybyrapûera
+
+Our plotting tool [ybyrapûera](../puera/) (`puera`) draws publication-ready SVG trees of the results. Build it as described in its README, and then run, from the main ybyra directory:
+
+```
+puera/bin/puera sample \
+    --tree-table-file trees/ftdna/ftdnaY.oct25.complete.tree \
+    --snps-table-file trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv \
+    --clade-labels-file trees/ftdna/ftdnaY.oct25.labels.tsv \
+    --ybyra-dir example \
+    --exclude-damage \
+    --out-dir example/plots
+
+puera/bin/puera summary \
+    --tree-table-file trees/ftdna/ftdnaY.oct25.complete.tree \
+    --snps-table-file trees/ftdna/hg37/ftdnaY.oct25.hg37.tsv \
+    --clade-labels-file trees/ftdna/ftdnaY.oct25.labels.tsv \
+    --ybyra-dir example \
+    --out-dir example/plots
+```
+
+The tree and SNP table are the ones of the FamilyTreeDNA tree used in this example, and `--exclude-damage` matches the `damage_filter: true` setting in `config.yaml`. This writes one tree per sample, and a summary tree of all samples, to `example/plots/`. The summary (left) and the tree of sample I5429 (right) look like this:
+
+![Expected ybyrapûera plots](expected_puera.png)
+
+The summary colors each branch by the number of samples placed in its clade. Here, six samples are in haplogroup I, one in G, and I7691 in R. The sample tree colors each branch by the tree score of the sample, with negative scores in red, and marks the placement I-L160 with a ring.

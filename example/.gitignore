@@ -10,6 +10,7 @@ tables/
 calls/
 yplace/
 step_size/
+plots/
 *.yplace
 *.pdf
 !expected_aggregate.yplace
