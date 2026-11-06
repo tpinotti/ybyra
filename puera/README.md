@@ -33,6 +33,10 @@ puera/bin/puera summary \
     --out-dir plots
 ```
 
+For the example, the summary (left) and the tree of sample I5429 (right) look like this:
+
+![Example ybyrapûera plots](../example/expected_puera.png)
+
 Use the tree of the ybyra run. The SNP table is optional, and used for branch lengths. `--exclude-damage` needs to match the `damage_filter` setting of the run. See `--help` for all options.
 
 The `trees/*/*.labels.tsv` files label the major haplogroups. They are made with `trees/make_clade_labels.py`, and can be edited by hand.
