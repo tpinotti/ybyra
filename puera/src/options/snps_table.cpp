@@ -135,7 +135,10 @@ std::vector<size_t> SnpsTableOptions::get_snps_per_edge_counts(
         auto const& edge = tree.edge_at( edge_index );
         auto const& parent_name = edge.primary_node().data<CommonNodeData>().name;
         auto const& child_name  = edge.secondary_node().data<CommonNodeData>().name;
-        if( parent_name != col_par[i] ) {
+        // SNP tables may leave the parent empty for SNPs on the branches below the root,
+        // as the root name is arbitrary. We accept that.
+        bool const root_without_parent = col_par[i].empty() && is_root( edge.primary_node() );
+        if( parent_name != col_par[i] && ! root_without_parent ) {
             throw std::runtime_error(
                 "Wrong parent name " + parent_name + " instead of " + col_par[i]
             );
